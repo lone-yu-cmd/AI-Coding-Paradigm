@@ -10,6 +10,8 @@
 
 **Skills Master** is a meta-skill designed to act as a package manager for the AI Skill ecosystem. It allows developers to easily install, update, and manage a library of "Standard Skills" (like `auto-committer`, `code-explainer`, `skill-creator`) across different projects and development environments (Trae, VS Code, Cursor, etc.).
 
+[English](README.md) | [中文版](README_zh-CN.md)
+
 ---
 
 ## 🚀 Features
@@ -48,7 +50,7 @@
 1.  **Clone the repository** (or copy the `skills-master` directory) into your project's skills directory (e.g., `.skills/` or just `skills/`).
 
     ```bash
-    git clone https://github.com/yourusername/skills-master.git .skills/skills-master
+    git clone https://github.com/lone-yu-cmd/skills-master.git .skills/skills-master
     ```
 
 2.  **Install Standard Skills**:
@@ -69,6 +71,14 @@
         ```bash
         python3 skills/skills-master/scripts/install.py --all
         ```
+
+### 💡 Recommended Workflow for Existing Projects
+
+If you are integrating Skills Master into an existing project:
+
+1.  **Bootstrap with Project Analyzer**: First, use `skills-master` to install **project-analyzer**. This will generate the necessary documentation to understand your project structure.
+2.  **AI-Assisted Development**: We **strongly recommend** installing **auto-committer** and **context-aware-coding**. These skills are crucial for providing context and automating tasks when working with AI assistants (like GPT).
+3.  **Customize**: Install other skills as needed for your specific development requirements.
 
 ---
 
