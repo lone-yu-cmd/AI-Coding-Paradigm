@@ -18,6 +18,7 @@ The following skill templates are available in `assets/skill-templates/`:
 *   **project-analyzer**: Bootstraps documentation for new/legacy projects.
 *   **skill-creator**: Creates new skills and maintains the index.
 *   **spec-kit-workflow**: Implements Spec-Driven Development (Specify -> Plan -> Tasks -> Implement).
+*   **git-diff-requirement**: Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation.
 ## Instructions
 
 ### List Available Skills
