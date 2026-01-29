@@ -1,8 +1,8 @@
 # Skills Master 🧰
 
-> **你的 AI 辅助开发通用技能管理器**
+> **AI  Skills 管理器**
 >
-> 跨项目和 IDE 管理、分发和标准化 AI 技能。
+> 跨项目和 IDE 管理、分发和标准化 AI 技能。Skills-Master希望你可以通过自然语言调用skills，让GPT完成你大部分需求。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/skills-master)
@@ -32,9 +32,10 @@
 | **code-explainer** | 为复杂逻辑生成结构化的代码分析报告。 |
 | **project-analyzer** | 为新项目或遗留项目引导“上下文优先”的文档。 |
 | **skill-creator** | 一个工具，用于轻松创建具有标准目录结构的新技能。 |
-| **add-in-skills-master** | 帮助将新技能注册到 Skills Master 库的助手。 |
+| **add-in-skills-master** | Adds or updates skill templates in the skills-master library. Invoke when user wants to contribute a new skill to the master library. |
 | **context-aware-coding** | 管理 `AI_README.md` 并强制执行架构上下文。 |
 | **spec-kit-workflow** | 将 [Spec-Kit](https://github.com/Start-With-Spec/Spec-Kit) 方法论（明确需求 -> 计划 -> 任务 -> 实现）集成到你的工作流中的技能。它包含用于规范驱动开发的模板和指南。 |
+| **git-diff-requirement** | Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation. |
 
 ---
 
@@ -82,10 +83,7 @@
 
 1.  **Fork 本仓库**。
 2.  **创建你的技能**，使用 `skill-creator`。
-3.  **将其添加到主库**，使用 `add-in-skills-master`：
-    ```bash
-    python3 skills/add-in-skills-master/scripts/add_skill.py --name your-skill-name --description "What it does" --source skills/your-skill-name
-    ```
+3.  **将其添加到主库**，使用 `add-in-skills-master`
 4.  **提交 Pull Request**。
 
 ### 指南

@@ -11,7 +11,7 @@ This skill acts as a package manager for the Skill ecosystem. It contains a libr
 
 The following skill templates are available in `assets/skill-templates/`:
 
-*   **add-in-skills-master**: Adds or updates skill templates in the skills-master library.
+*   **add-in-skills-master**: Adds or updates skill templates in the skills-master library. Invoke when user wants to contribute a new skill to the master library.
 *   **auto-committer**: Automates git commits with Context Refresh checks.
 *   **code-explainer**: Generates structured code analysis reports.
 *   **context-aware-coding**: Manages `AI_README.md` and enforces Context-First Architecture.

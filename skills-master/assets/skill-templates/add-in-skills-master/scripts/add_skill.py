@@ -90,6 +90,72 @@ def update_single_master(master_dir, skill_name, description, source_path):
 
     # 2. Update Documentation
     update_skills_master_doc(doc_path, skill_name, description)
+    
+    # 3. Update Project Root READMEs if we are in the root skills-master
+    # Logic: If master_dir has a sibling README.md (i.e. it IS the project root), update it.
+    # OR if master_dir is inside a project root (like .../project/skills-master)
+    
+    # Check for README.md in the parent of master_dir (if master_dir is 'skills-master')
+    # OR check if master_dir IS the project root (unlikely if it's named skills-master)
+    
+    # Case: master_dir is .../SkillsMaster/skills-master
+    # Parent is .../SkillsMaster (Project Root)
+    project_root = os.path.dirname(master_dir)
+    readme_path = os.path.join(project_root, "README.md")
+    readme_zh_path = os.path.join(project_root, "README_zh-CN.md")
+    
+    if os.path.exists(readme_path):
+        update_project_readme(readme_path, skill_name, description)
+        
+    if os.path.exists(readme_zh_path):
+        update_project_readme(readme_zh_path, skill_name, description)
+
+def update_project_readme(readme_path, skill_name, description):
+    """Updates the skill table in the project's README.md / README_zh-CN.md"""
+    print(f"Updating project readme at {readme_path}...")
+    
+    with open(readme_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        
+    # Pattern to find the table row: | **skill-name** | ... |
+    # Regex: \| \*\*skill-name\*\* \| .* \|
+    pattern = re.compile(f"\\| \\*\\*{re.escape(skill_name)}\\*\\* \\| .* \\|")
+    
+    # Clean description for table (remove newlines, escape pipes)
+    clean_desc = description.replace('\n', ' ').replace('|', '\|')
+    new_row = f"| **{skill_name}** | {clean_desc} |"
+    
+    if pattern.search(content):
+        # Update existing row
+        print(f"  - Updating existing row for {skill_name}")
+        content = re.sub(f"\\| \\*\\*{re.escape(skill_name)}\\*\\* \\| .* \\|", new_row, content)
+    else:
+        # Add new row
+        # Look for the last table row to append after
+        # We assume the table is under "## Included Skills" or "## 包含的技能"
+        # And rows start with "| **"
+        print(f"  - Adding new row for {skill_name}")
+        
+        # Find the last row that matches the skill table format
+        # This is a bit heuristic. We look for lines starting with "| **"
+        
+        lines = content.split('\n')
+        last_table_row_index = -1
+        
+        for i, line in enumerate(lines):
+            if line.strip().startswith("| **"):
+                last_table_row_index = i
+        
+        if last_table_row_index != -1:
+            lines.insert(last_table_row_index + 1, new_row)
+            content = "\n".join(lines)
+        else:
+            print(f"  - Warning: Could not find table to insert into in {readme_path}")
+            return
+
+    with open(readme_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"  - Successfully updated {os.path.basename(readme_path)}")
 
 def update_skills_master_doc(doc_path, skill_name, description):
     """Updates the Capabilities section in skills-master/SKILL.md"""

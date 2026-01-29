@@ -18,6 +18,8 @@ Invoke this skill when:
 
 1.  **Template Registration**: Copies a skill directory (source) to the `skills-master/assets/skill-templates/` directory.
 2.  **Documentation Update**: Automatically updates `skills-master/SKILL.md` to list the new skill under "Capabilities" with its description.
+3.  **Project README Update**: If the script detects it's running in the Skills Master open-source repository root, it automatically updates `README.md` and `README_zh-CN.md` with the new skill.
+
 
 ## Usage
 

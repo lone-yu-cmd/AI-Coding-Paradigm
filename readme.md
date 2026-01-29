@@ -2,7 +2,7 @@
 
 > **Your Universal Skill Manager for AI-Assisted Development**
 >
-> Manage, distribute, and standardize AI skills across your projects and IDEs.
+> Manage, distribute, and standardize AI skills across your projects and IDEs. **Skills-Master** helps you call skills in natural language, enabling GPT to handle most of your development tasks.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/skills-master)
@@ -32,9 +32,10 @@
 | **code-explainer** | Generates structured code analysis reports for complex logic. |
 | **project-analyzer** | Bootstraps Context-First documentation for new or legacy projects. |
 | **skill-creator** | A tool to easily create new skills with standard directory structures. |
-| **add-in-skills-master** | Helper to register new skills into the Skills Master library. |
+| **add-in-skills-master** | Adds or updates skill templates in the skills-master library. Invoke when user wants to contribute a new skill to the master library. |
 | **context-aware-coding** | Manages `AI_README.md` and enforces architectural context. |
 | **spec-kit-workflow** | A skill that integrates [Spec-Kit](https://github.com/Start-With-Spec/Spec-Kit) methodology (Specify -> Plan -> Tasks -> Implement) into your workflow. It includes templates and guides for Spec-Driven Development. |
+| **git-diff-requirement** | Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation. |
 
 ---
 
