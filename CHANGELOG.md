@@ -8,4 +8,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- refactor spec-kit-workflow to be self-contained and update docs
 - add auto-committer skill

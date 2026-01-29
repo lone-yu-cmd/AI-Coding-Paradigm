@@ -34,7 +34,7 @@
 | **skill-creator** | 一个工具，用于轻松创建具有标准目录结构的新技能。 |
 | **add-in-skills-master** | 帮助将新技能注册到 Skills Master 库的助手。 |
 | **context-aware-coding** | 管理 `AI_README.md` 并强制执行架构上下文。 |
-| **spec-kit-workflow** | 实现规范驱动开发（Specify -> Plan -> Tasks -> Implement）。 |
+| **spec-kit-workflow** | 将 [Spec-Kit](https://github.com/Start-With-Spec/Spec-Kit) 方法论（明确需求 -> 计划 -> 任务 -> 实现）集成到你的工作流中的技能。它包含用于规范驱动开发的模板和指南。 |
 
 ---
 
@@ -46,31 +46,13 @@
 *   Git
 
 ### 快速开始
-
-1.  **克隆仓库**（或复制 `skills-master` 目录）到你项目的 skills 目录（例如 `.skills/` 或直接在 `skills/`）。
+**克隆仓库**（或复制 `skills-master` 目录）到你IDE的 skills 目录。
 
     ```bash
-    git clone https://github.com/yourusername/skills-master.git .skills/skills-master
+    git clone https://github.com/lone-yu-cmd/skills-master.git .skills/skills-master
     ```
 
-2.  **安装标准技能**：
-
-    你可以使用安装脚本安装特定技能或所有可用技能。
-
-    *   **列出可用技能**：
-        ```bash
-        python3 skills/skills-master/scripts/install.py --list
-        ```
-
-    *   **安装特定技能**（例如 `auto-committer`）：
-        ```bash
-        python3 skills/skills-master/scripts/install.py --name auto-committer
-        ```
-
-    *   **安装所有技能**：
-        ```bash
-        python3 skills/skills-master/scripts/install.py --all
-        ```
+打开IDE的SKILL能力，在聊天窗口告诉GPT: "当前Skill-master有哪些技能？" 或者 "调用skill-master帮我安装auto-committer"
 
 ### 💡 现有项目的推荐工作流
 
@@ -88,24 +70,11 @@
 
 ### 示例：创建一个新技能
 
-使用 **skill-creator**（安装后）生成一个新的技能模板：
-
-```bash
-python3 skills/skill-creator/scripts/create_skill.py \
-  --name my-custom-skill \
-  --description "A custom skill that does amazing things"
-```
+使用 **skill-creator**（安装后）生成一个新的技能模板
 
 ### 示例：自动化提交
 
-使用 **auto-committer** 处理你的 git 工作流：
-
-```bash
-# 分析变更，更新 changelog 并提交
-python3 skills/auto-committer/scripts/manage_changelog.py add --type feat --message "implement user login"
-```
-
----
+使用 **auto-committer** 处理你的 git 工作流
 
 ## 🤝 贡献
 

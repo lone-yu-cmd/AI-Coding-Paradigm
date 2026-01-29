@@ -4,8 +4,22 @@ import argparse
 import sys
 
 # Constants
-SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "skill-templates")
+# Assuming structure:
+# .../skills/skills-master/scripts/install.py  (when installed in user's project)
+# OR
+# .../SkillsMaster/skills-master/scripts/install.py (in repo dev)
+
+# We need to find the "skills" directory where other skills should be installed.
+# If this script is in .../skills/skills-master/scripts/install.py, 
+# then os.path.dirname(os.path.abspath(__file__)) is .../skills/skills-master/scripts
+# ... up one level is .../skills/skills-master
+# ... up two levels is .../skills  <-- This is the target SKILLS_DIR
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+SKILLS_MASTER_DIR = os.path.dirname(CURRENT_DIR) # .../skills-master
+SKILLS_DIR = os.path.dirname(SKILLS_MASTER_DIR) # .../skills (target directory)
+
+TEMPLATES_DIR = os.path.join(SKILLS_MASTER_DIR, "assets", "skill-templates")
 
 def install_skill(skill_name):
     src = os.path.join(TEMPLATES_DIR, skill_name)

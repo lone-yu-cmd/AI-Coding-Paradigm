@@ -24,8 +24,8 @@ The process follows a strict linear progression. Always complete the current pha
 
 1.  **Ask** the user for a feature description if not provided.
 2.  **Action**:
-    -   Generate a short-name (e.g., `user-auth`).
-    -   Create/Update the spec file in `.specs/` (using `.specify/templates/spec-template.md`).
+    -   Generate a short-name (e.g., `001-user-auth`). Everytime you start a new feature, increment the number.
+    -   Create/Update the spec file in `.specs/` (using `assets/.specify/templates/spec-template.md`).
     -   Define: User Scenarios, Functional Requirements, Success Criteria.
 3.  **Output**: A filled `spec.md`.
 
@@ -37,7 +37,7 @@ The process follows a strict linear progression. Always complete the current pha
 2.  **Action**:
     -   **Context Loading**: Read `docs/AI_CONTEXT/ARCHITECTURE.md` and `docs/AI_CONTEXT/CONSTITUTION.md` to ensure architectural alignment.
     -   Analyze `spec.md`.
-    -   Create `plan.md` (using `.specify/templates/plan-template.md`).
+    -   Create `plan.md` (using `assets/.specify/templates/plan-template.md`).
     -   Define: Tech Stack, Architecture, Data Models, API Contracts.
     -   Resolve "NEEDS CLARIFICATION" items.
 3.  **Output**: `plan.md`, `data-model.md`, `contracts/`.
@@ -48,7 +48,7 @@ The process follows a strict linear progression. Always complete the current pha
 
 1.  **Prerequisite**: Phase 2 complete.
 2.  **Action**:
-    -   Generate `tasks.md` (using `.specify/templates/tasks-template.md`).
+    -   Generate `tasks.md` (using `assets/.specify/templates/tasks-template.md`).
     -   **Rule**: Organize tasks by **User Story**.
     -   **Format**: `- [ ] [TaskID] [P?] [Story?] Description with file path`.
     -   Identify parallelizable tasks `[P]`.
@@ -67,9 +67,10 @@ The process follows a strict linear progression. Always complete the current pha
 
 ## Helper Instructions for Agent
 
--   **Files**: Always look for templates in `.specify/templates/`.
+-   **Files**: Always look for templates in `assets/.specify/templates/`.
 -   **Context**: Always read the output of the previous phase before starting the next.
--   **Tools**: You can use `RunCommand` to execute helper scripts in `.specify/scripts/` if needed, or manually create the markdown files if the CLI is not available/reliable.
+-   **Tools**: You can use `RunCommand` to execute helper scripts in `assets/.specify/scripts/` if needed, or manually create the markdown files if the CLI is not available/reliable.
+-   **Path Resolution**: All paths starting with `assets/` in this document are relative to this skill's installation directory. You must determine the skill's location (e.g., `skills/spec-kit-workflow/` or `.trae/skills/spec-kit-workflow/`) and prepend it to access these files.
 -   **Constitution**: Always check `docs/AI_CONTEXT/CONSTITUTION.md` to ensure architectural alignment.
 
 ## Example Interaction

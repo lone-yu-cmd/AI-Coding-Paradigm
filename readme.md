@@ -34,7 +34,7 @@
 | **skill-creator** | A tool to easily create new skills with standard directory structures. |
 | **add-in-skills-master** | Helper to register new skills into the Skills Master library. |
 | **context-aware-coding** | Manages `AI_README.md` and enforces architectural context. |
-| **spec-kit-workflow** | Implements Spec-Driven Development (Specify -> Plan -> Tasks -> Implement). |
+| **spec-kit-workflow** | A skill that integrates [Spec-Kit](https://github.com/Start-With-Spec/Spec-Kit) methodology (Specify -> Plan -> Tasks -> Implement) into your workflow. It includes templates and guides for Spec-Driven Development. |
 
 ---
 
@@ -46,31 +46,13 @@
 *   Git
 
 ### Quick Start
-
-1.  **Clone the repository** (or copy the `skills-master` directory) into your project's skills directory (e.g., `.skills/` or just `skills/`).
+**Clone the repository** (or copy the `skills-master` directory) into your IDE's skills directory.
 
     ```bash
     git clone https://github.com/lone-yu-cmd/skills-master.git .skills/skills-master
     ```
 
-2.  **Install Standard Skills**:
-
-    You can install specific skills or all available skills using the installation script.
-
-    *   **List available skills**:
-        ```bash
-        python3 skills/skills-master/scripts/install.py --list
-        ```
-
-    *   **Install a specific skill** (e.g., `auto-committer`):
-        ```bash
-        python3 skills/skills-master/scripts/install.py --name auto-committer
-        ```
-
-    *   **Install ALL skills**:
-        ```bash
-        python3 skills/skills-master/scripts/install.py --all
-        ```
+Open your IDE's SKILL capabilities and tell the AI Assistant: "What skills are available in Skill-master?" or "Call skill-master to help me install auto-committer".
 
 ### 💡 Recommended Workflow for Existing Projects
 
@@ -88,23 +70,11 @@ Once installed, each skill resides in its own directory (e.g., `skills/auto-comm
 
 ### Example: Creating a New Skill
 
-Use the **skill-creator** (once installed) to generate a new skill template:
-
-```bash
-python3 skills/skill-creator/scripts/create_skill.py \
-  --name my-custom-skill \
-  --description "A custom skill that does amazing things"
-```
+Use the **skill-creator** (once installed) to generate a new skill template
 
 ### Example: Automating Commits
 
-Use the **auto-committer** to handle your git workflow:
-
-```bash
-# Analyze changes, update changelog, and commit
-python3 skills/auto-committer/scripts/manage_changelog.py add --type feat --message "implement user login"
-```
-
+Use the **auto-committer** to handle your git workflow
 ---
 
 ## 🤝 Contributing
@@ -114,9 +84,6 @@ We welcome contributions! If you have a useful skill you'd like to share with th
 1.  **Fork the repository**.
 2.  **Create your skill** using `skill-creator`.
 3.  **Add it to the master library** using `add-in-skills-master`:
-    ```bash
-    python3 skills/add-in-skills-master/scripts/add_skill.py --name your-skill-name --description "What it does" --source skills/your-skill-name
-    ```
 4.  **Submit a Pull Request**.
 
 ### Guidelines
