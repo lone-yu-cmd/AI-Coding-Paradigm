@@ -1,28 +1,39 @@
 ---
 name: "project-analyzer"
-description: "Scans project structure to infer technology stack and architecture, then generates standard Context-First documentation. Invoke when initializing a new project or refreshing docs."
+description: "Scans project structure to infer technology stack and architecture, then generates AI-optimized Context-First documentation. Invoke when initializing a new project or refreshing docs."
 ---
 
 # Project Analyzer
 
-This skill bootstraps the **Context-First Architecture** for any project by analyzing its structure and generating base documentation.
+## PURPOSE
+Bootstraps **Context-First Architecture** for any project by analyzing structure and generating AI-optimized documentation.
 
-## When to Use
-- Onboarding a new project.
-- Initializing the `docs/AI_CONTEXT/` structure.
-- When the project structure changes significantly.
+## WHEN_TO_USE
+- Onboarding a new project
+- Initializing `docs/AI_CONTEXT/` structure
+- Project structure changes significantly
 
-## Instructions
+## INSTRUCTIONS
 
-1.  **Run Analysis**:
-    Execute the analysis script to scan the current working directory:
-    ```bash
-    python3 skills/project-analyzer/scripts/analyze.py
-    ```
+### Step 1: Run Analysis
+```bash
+python3 skills/project-analyzer/scripts/analyze.py
+```
 
-2.  **Review & Refine**:
-    -   The script generates `docs/AI_CONTEXT/ARCHITECTURE.md` and `CONSTITUTION.md`.
-    -   **Action**: Open these files and refine the auto-generated placeholders with specific project details.
+### Step 2: Review & Refine
+- OUTPUT_FILES:
+  - `docs/AI_CONTEXT/ARCHITECTURE.md` → Project structure and tech stack
+  - `docs/AI_CONTEXT/CONSTITUTION.md` → Coding rules and constraints
+- MUST: Replace all `(placeholder)` markers with actual project details
+- MUST: Verify generated content matches current codebase state
 
-3.  **Integrate**:
-    -   Once generated, other skills like `context-aware-coding` will automatically start using these files as the source of truth.
+### Step 3: Integrate
+- Other skills (e.g., `context-aware-coding`) auto-read these files as source of truth
+
+## OUTPUT_FORMAT_RULES
+Generated docs follow AI-optimized format specification:
+- MUST: Use `MUST/NEVER/PREFER` semantic keywords for rules
+- MUST: Use `PATH → PURPOSE` mapping for directory structures
+- MUST: Use numbered steps for flows, not ASCII diagrams
+- NEVER: Use ASCII art, tree diagrams, or visual decorations
+- REFER: `assets/AI_DOCUMENT_SPECIFICATION.md` for complete format guide
