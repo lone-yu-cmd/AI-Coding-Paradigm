@@ -6,3 +6,22 @@
 
 specs/
 tmp/
+
+
+# docs
+CLAUDE.md
+docs
+
+# scripts
+scripts/
+
+# node_modules
+node_modules/
+
+# package manage
+package.json
+pnpm-lock.yaml
+
+# debug output
+debug-output
+

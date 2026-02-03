@@ -1,0 +1,18 @@
+{
+  "name": "playwright-analyze-page-scripts",
+  "version": "1.0.0",
+  "description": "Playwright CDP 连接脚本 - 用于分析 Chrome 页面的 DOM 和样式",
+  "type": "module",
+  "scripts": {
+    "launch": "./launch-chrome.sh",
+    "analyze": "node connect-cdp.js",
+    "analyze:styles": "node connect-cdp.js 0"
+  },
+  "dependencies": {
+    "playwright": "^1.58.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": ["darwin", "linux", "win32"]
+}
