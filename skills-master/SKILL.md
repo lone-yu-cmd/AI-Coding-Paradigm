@@ -19,6 +19,7 @@ The following skill templates are available in `assets/skill-templates/`:
 *   **skill-creator**: Creates new skills and maintains the index.
 *   **spec-kit-workflow**: Implements Spec-Driven Development (Specify -> Plan -> Tasks -> Implement).
 *   **git-diff-requirement**: Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation.
+*   **subagent-creator**: 专门用于生成子智能体的 skill，通过交互式问答收集信息并生成标准化的子智能体配置文档
 ## Instructions
 If you want to use the following command, you need to change the current directory to the upper directory of `skills/`.
 
