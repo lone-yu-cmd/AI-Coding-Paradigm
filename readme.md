@@ -1,30 +1,107 @@
-# Skills Master 🧰
+# AI-Coding-Paradigm 🚀
 
-> **Your Universal Skill Manager for AI-Assisted Development**
+> **A Comprehensive Framework for AI-Assisted Development**
 >
-> Manage, distribute, and standardize AI skills across your projects and IDEs. **Skills-Master** helps you call skills in natural language, enabling GPT to handle most of your development tasks.
+> Standardize, automate, and enhance your AI-powered development workflow with three powerful core modules: Skills Management, Rule Generation, and Sub-Agent Systems.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/skills-master)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/ai-coding-paradigm)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-**Skills Master** is a meta-skill designed to act as a package manager for the AI Skill ecosystem. It allows developers to easily install, update, and manage a library of "Standard Skills" (like `auto-committer`, `code-explainer`, `skill-creator`) across different projects and development environments (Trae, VS Code, Cursor, etc.).
+**AI-Coding-Paradigm** is a comprehensive framework that revolutionizes AI-assisted development by providing three integrated core modules. It enables developers to manage reusable skills, generate standardized rules, and deploy specialized sub-agents across different projects and development environments (Trae, VS Code, Cursor, etc.).
+
+## 🎯 Project Overview
+
+This framework consists of three equal and complementary core modules:
+
+- **🧰 Skills-Master**: Universal skill management system for AI capabilities
+- **📋 Rule-Master**: Standardized rule generation and management
+- **🤖 Subagents-Master**: Specialized sub-agent creation and deployment
+
+Together, these modules form a complete ecosystem for building, managing, and scaling AI-assisted development workflows.
 
 [English](README.md) | [中文版](README_zh-CN.md)
 
 ---
 
-## 🚀 Features
+## 🏗️ Core Modules
 
-*   **📦 Centralized Skill Repository**: A curated collection of standard skills ready to be deployed.
-*   **🛠️ Universal Compatibility**: Designed to work across different IDEs by removing environment-specific dependencies.
-*   **🔄 Easy Installation**: Simple scripts to bootstrap your environment with essential AI capabilities.
-*   **🧩 Extensible Architecture**: Easily add your own custom skills to the master library.
-*   **🤖 Automation Ready**: Includes skills for automated git workflows, code analysis, and documentation generation.
+### 🧰 Skills-Master
+
+**Your Universal Skill Manager for AI-Assisted Development**
+
+Skills-Master acts as a package manager for the AI Skill ecosystem, allowing developers to easily install, update, and manage a library of "Standard Skills" across different projects.
+
+**Key Features:**
+- 📦 **Centralized Skill Repository**: Curated collection of 13+ standard skills ready to deploy
+- 🛠️ **Universal Compatibility**: Works across different IDEs (Trae, VS Code, Cursor)
+- 🔄 **Easy Installation**: Simple scripts to bootstrap your environment
+- 🧩 **Extensible Architecture**: Add your own custom skills to the library
+- 🤖 **Automation Ready**: Includes skills for git workflows, code analysis, and documentation
+
+**Location**: `skills-master/`
+
+### 📋 Rule-Master
+
+**Standardized Rule Generation and Management System**
+
+Rule-Master provides a systematic approach to defining and managing development rules, coding standards, and AI interaction guidelines for your projects.
+
+**Key Features:**
+- 📝 **Rule Templates**: Pre-defined templates for common development scenarios
+- 🎯 **Standardization**: Ensure consistent coding practices across teams
+- 🔧 **Customizable**: Adapt rules to your project's specific needs
+- 📚 **Rule Library**: 11+ standard rule definitions (role, tech-stack, coding-style, etc.)
+- 🤝 **AI Integration**: Rules that guide AI assistants in understanding your project
+
+**Location**: `rule-master/`
+
+### 🤖 Subagents-Master
+
+**Specialized Sub-Agent Creation and Deployment System**
+
+Subagents-Master enables you to create and manage specialized AI sub-agents that handle specific, complex tasks with domain expertise.
+
+**Key Features:**
+- 🎭 **Specialized Agents**: Create focused agents for specific domains (e.g., code-mysql-converter)
+- 🔄 **Interactive Creation**: Guided workflow for sub-agent generation
+- 📦 **Standardized Structure**: Consistent configuration and deployment format
+- 🧠 **Domain Expertise**: Agents with deep knowledge in specific areas
+- 🔌 **Easy Integration**: Seamlessly integrate with your existing workflow
+
+**Location**: `subagents-master/`
 
 ---
 
-## 📦 Included Skills
+## 🔗 Module Collaboration
+
+These three modules work together to create a powerful AI development ecosystem:
+
+```
+┌─────────────────┐
+│  Skills-Master  │ ← Provides reusable capabilities
+└────────┬────────┘
+         │
+         ├
+         │          
+┌────────▼────────┐
+│ Subagents-Master ← Defines domain-specific agents
+└─────────────────┘ 
+       
+       
+       
+┌─────────────────────┐
+│  Rule-Master        │ ← Defines standards and guidelines
+└─────────────────────┘
+```
+
+- **Skills** provide the building blocks for common tasks
+- **Rules** ensure consistency and guide AI behavior
+- **Sub-agents** tackle complex, domain-specific challenges
+
+---
+
+## 📦 Skills-Master: Included Skills
 
 | Skill Name | Description |
 | :--- | :--- |
@@ -52,21 +129,37 @@
 *   Git
 
 ### Quick Start
-**Clone the repository** (or copy the `skills-master` directory) into your IDE's skills directory.
 
-    ```bash
-    git clone https://github.com/lone-yu-cmd/skills-master.git .skills/skills-master
-    ```
+**Clone the repository** to get all three core modules:
 
-Open your IDE's SKILL capabilities and tell the AI Assistant: "What skills are available in Skill-master?" or "Call skill-master to help me install auto-committer".
+```bash
+git clone https://github.com/lone-yu-cmd/ai-coding-paradigm.git
+```
+
+The repository structure:
+```
+ai-coding-paradigm/
+├── skills-master/      # Skill management system
+├── rule-master/        # Rule generation system
+├── subagents-master/   # Sub-agent system
+└── docs/              # Documentation
+```
+
+**For Skills-Master**: Copy or symlink the `skills-master` directory to your IDE's skills directory, then tell the AI Assistant: "What skills are available in Skills-Master?" or "Call skills-master to help me install auto-committer".
+
+**For Rule-Master**: Use the rule generation tools to create standardized rules for your project.
+
+**For Subagents-Master**: Create specialized sub-agents using the `subagent-creator` skill.
 
 ### 💡 Recommended Workflow for Existing Projects
 
-If you are integrating Skills Master into an existing project:
+If you are integrating AI-Coding-Paradigm into an existing project:
 
-1.  **Bootstrap with Project Analyzer**: First, use `skills-master` to install **project-analyzer**. This will generate the necessary documentation to understand your project structure.
-2.  **AI-Assisted Development**: We **strongly recommend** installing **auto-committer** and **context-aware-coding**. These skills are crucial for providing context and automating tasks when working with AI assistants (like GPT).
-3.  **Customize**: Install other skills as needed for your specific development requirements.
+1.  **Initialize Documentation**: Use **ai-context-sync** skill to generate AI context documentation (`docs/AI_CONTEXT/`).
+2.  **Define Rules**: Use **rule-master** to establish coding standards and AI interaction guidelines.
+3.  **Install Core Skills**: We **strongly recommend** installing **auto-committer** and **context-aware-coding** for automated workflows.
+4.  **Create Sub-Agents**: Use **subagent-creator** to build specialized agents for complex domain-specific tasks.
+5.  **Customize**: Add more skills and rules as needed for your specific requirements.
 
 ---
 

@@ -275,63 +275,7 @@ git diff --cached --name-status
 ##### 详细环境检测逻辑
 
 **Subagent 可用性检测**
-
-subagent:
-name: "doc-maintainer"
-description: "专门用于文档分析和维护的子智能体，负责分析代码变更对文档的影响并提供更新建议"
-trigger_condition: "当处理大型项目或批量文档更新时自动调用"
-fallback: "主 Agent 直接处理"
-
-```python
-# 检测 Subagent 是否已配置并可用
-# 1. 检查 SKILL.md frontmatter 中声明的 subagent
-# 2. 检查项目的 .codebuddy/subagents/ 目录或 subagents-master/ 目录
-# 3. 验证对应的 subagent.md 文件是否存在
-
-def check_subagent_availability(subagent_name: str) -> bool:
-    """检测指定的 Subagent 是否可用"""
-    search_paths = [
-        f".codebuddy/subagents/{subagent_name}/subagent.md",
-        f"subagents-master/{subagent_name}/subagent.md"
-    ]
-    for path in search_paths:
-        if os.path.exists(path):
-            return True
-    return False
-```
-
-**执行级别判断逻辑**
-
-```
-IF SKILL.md 声明了 subagent 配置
-  AND 对应的 Subagent 已安装
-  AND 用户未禁用 Subagent（.aicontextrc.json 中 useSubagent != false）
-THEN
-  LEVEL = 3（Subagent 辅助模式）
-ELSE IF 检测到 AI CLI 工具可用
-THEN
-  LEVEL = 2（CLI 调用模式）
-ELSE
-  LEVEL = 1（提示模式）
-```
-
-**CLI 工具检测**
-
-```bash
-# 检测 CLI 工具
-CLI_AVAILABLE=""
-for cli in codebuddy-cli cursor-cli ai-context-cli; do
-    if command -v "$cli" &>/dev/null; then
-        CLI_AVAILABLE="$cli"
-        break
-    fi
-done
-
-# 检测环境变量指定的 CLI
-if [[ -n "$AI_CLI_PATH" && -x "$AI_CLI_PATH" ]]; then
-    CLI_AVAILABLE="$AI_CLI_PATH"
-fi
-```
+检查和当前项目里面是否配置了需要的subagent和用户反馈你能检索到subagent的真实情况
 
 **环境变量支持**
 

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+- rebrand project to AI-Coding-Paradigm with three-module architecture (Skills-Master, Rule-Master, Subagents-Master)
+
 ### Added
 - enforce ${SKILL_DIR} path usage for cross-IDE compatibility
 - add requirements-implementation-plan skill template for standardized requirement analysis workflow
