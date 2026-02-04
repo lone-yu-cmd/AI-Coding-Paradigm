@@ -1,0 +1,35 @@
+{
+  "id": "mandatory_docs",
+  "title": "必读文档",
+  "description": "指定 AI 在开始工作前必须阅读的文档",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "添加必读文档路径",
+      "value": "custom_doc",
+      "content": "- **Must Read**: `{path}` ({desc})",
+      "inputs": [
+        {
+          "key": "path",
+          "prompt": "文档路径 (相对根目录)",
+          "default": "README.md"
+        },
+        {
+          "key": "desc",
+          "prompt": "文档说明",
+          "default": "项目概览"
+        }
+      ]
+    },
+    {
+      "label": "API 文档",
+      "value": "api_doc",
+      "content": "- **Must Read**: `docs/api.md` (API Interface Definitions)"
+    },
+    {
+      "label": "数据库设计文档",
+      "value": "db_doc",
+      "content": "- **Must Read**: `docs/schema.md` (Database Schema)"
+    }
+  ]
+}

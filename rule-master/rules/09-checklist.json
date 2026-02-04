@@ -1,0 +1,18 @@
+{
+  "id": "checklist",
+  "title": "交付前自查清单 (DoD)",
+  "description": "AI 在提交代码前必须执行的检查",
+  "type": "single_select",
+  "options": [
+    {
+      "label": "标准自查清单",
+      "value": "standard_checklist",
+      "content": "### Definition of Done (Checklist)\nBefore responding, verify:\n- [ ] All new dependencies are added to `requirements.txt` / `package.json`.\n- [ ] No debug prints or temporary comments remain.\n- [ ] Code is formatted and linted.\n- [ ] Potential edge cases are handled.\n- [ ] Tests are updated/added if logic changed."
+    },
+    {
+      "label": "严格自查清单 (含文档)",
+      "value": "strict_checklist",
+      "content": "### Definition of Done (Checklist)\nBefore responding, verify:\n- [ ] All new dependencies are added to dependency files.\n- [ ] No debug prints.\n- [ ] Code follows all style guides.\n- [ ] **Documentation is updated** (API, DB, Config).\n- [ ] Tests passed locally."
+    }
+  ]
+}

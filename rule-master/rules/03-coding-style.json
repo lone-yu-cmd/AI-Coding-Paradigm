@@ -1,0 +1,30 @@
+{
+  "id": "coding_style",
+  "title": "编码风格",
+  "description": "选择代码风格规范 (支持多选)",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "Python (PEP 8 + Type Hints)",
+      "value": "python_style",
+      "content": "## Coding Style (Python)\n- **Formatting**: Follow PEP 8. Use `black` for formatting (line length 88).\n- **Type Hints**: Strictly use type hints for all function arguments and return values.\n- **Naming**: `snake_case` for variables/functions, `PascalCase` for classes.\n- **Docstrings**: Use {docstyle} style docstrings.",
+      "inputs": [
+        {
+          "key": "docstyle",
+          "prompt": "Docstring 风格 (Google/NumPy/Sphinx)",
+          "default": "Google"
+        }
+      ]
+    },
+    {
+      "label": "TypeScript / JavaScript (Standard)",
+      "value": "ts_style",
+      "content": "## Coding Style (TypeScript)\n- **Formatting**: Use Prettier with standard config.\n- **Naming**: `camelCase` for variables/functions, `PascalCase` for classes/components.\n- **Strict Mode**: `strict: true` in tsconfig. No `any` type allowed unless absolutely necessary."
+    },
+    {
+      "label": "Go (Effective Go)",
+      "value": "go_style",
+      "content": "## Coding Style (Go)\n- **Formatting**: Always use `gofmt`.\n- **Error Handling**: Handle errors explicitly. Do not ignore errors.\n- **Naming**: Short, concise names. `CamelCase` for exported, `camelCase` for internal."
+    }
+  ]
+}

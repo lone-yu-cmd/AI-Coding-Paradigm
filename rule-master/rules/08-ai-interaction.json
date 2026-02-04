@@ -1,0 +1,35 @@
+{
+  "id": "ai_interaction",
+  "title": "AI 交互偏好",
+  "description": "设定 AI 的沟通方式和行为模式",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "主动澄清需求 (推荐)",
+      "value": "clarify",
+      "content": "### Interaction Rules\n- **Clarification**: Always ask questions to clarify requirements BEFORE writing code. Do not guess. Continue asking until all ambiguity is resolved."
+    },
+    {
+      "label": "思维链 (Chain of Thought)",
+      "value": "cot",
+      "content": "### Interaction Rules\n- **Thinking Process**: Briefly explain your plan/logic step-by-step before generating code."
+    },
+    {
+      "label": "语言偏好",
+      "value": "language",
+      "content": "### Interaction Rules\n- **Language**: Use {lang} for explanations, but keep code comments in English.",
+      "inputs": [
+        {
+          "key": "lang",
+          "prompt": "解释语言 (中文/English)",
+          "default": "中文"
+        }
+      ]
+    },
+    {
+      "label": "完整代码输出",
+      "value": "full_code",
+      "content": "### Interaction Rules\n- **Code Output**: Always output the FULL function/class when modifying. Do not use `// ... existing code ...` unless the file is extremely large."
+    }
+  ]
+}

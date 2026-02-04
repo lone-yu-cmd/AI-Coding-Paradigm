@@ -1,0 +1,30 @@
+{
+  "id": "glossary",
+  "title": "项目术语表",
+  "description": "定义项目核心术语，统一命名规范",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "添加术语定义",
+      "value": "custom_term",
+      "content": "- **{term}**: {definition} (Code: `{variable_name}`)",
+      "inputs": [
+        {
+          "key": "term",
+          "prompt": "术语名称 (如: 订单)",
+          "default": "Term"
+        },
+        {
+          "key": "definition",
+          "prompt": "业务定义",
+          "default": "Definition"
+        },
+        {
+          "key": "variable_name",
+          "prompt": "对应的变量名 (如: order_record)",
+          "default": "var_name"
+        }
+      ]
+    }
+  ]
+}

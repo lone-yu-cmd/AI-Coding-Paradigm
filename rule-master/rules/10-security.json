@@ -1,0 +1,18 @@
+{
+  "id": "security",
+  "title": "安全与隐私规范",
+  "description": "项目安全红线",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "通用安全规范",
+      "value": "general_sec",
+      "content": "### Security Guidelines\n- **Secrets**: NEVER hardcode secrets (API keys, passwords). Use Environment Variables.\n- **Input Validation**: Validate all external inputs (API params, file uploads).\n- **Dependencies**: Avoid using packages with known vulnerabilities."
+    },
+    {
+      "label": "Web 安全 (OWASP)",
+      "value": "web_sec",
+      "content": "### Security Guidelines (Web)\n- **SQL Injection**: Always use parameterized queries / ORM.\n- **XSS**: Escape user output.\n- **CSRF**: Ensure CSRF protection is enabled."
+    }
+  ]
+}

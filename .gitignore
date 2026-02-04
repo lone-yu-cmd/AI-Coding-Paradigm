@@ -25,3 +25,7 @@ pnpm-lock.yaml
 # debug output
 debug-output
 
+# generate file
+**rule.md
+
+.aicontext*

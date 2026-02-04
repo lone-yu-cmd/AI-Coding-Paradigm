@@ -1,0 +1,35 @@
+{
+  "id": "engineering_practices",
+  "title": "工程实践",
+  "description": "选择工程化最佳实践 (支持多选)",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "日志规范 (Logging)",
+      "value": "logging",
+      "content": "### Logging\n- **Library**: Use `{lib}` for structured logging.\n- **Rule**: Never use `print()`. Log with context (e.g., request_id).",
+      "inputs": [
+        {
+          "key": "lib",
+          "prompt": "日志库 (如 structlog/winston)",
+          "default": "structlog"
+        }
+      ]
+    },
+    {
+      "label": "错误处理 (Error Handling)",
+      "value": "error_handling",
+      "content": "### Error Handling\n- **Exceptions**: Catch specific exceptions, never bare `except:`.\n- **Response**: Return standardized error responses (code, message, details)."
+    },
+    {
+      "label": "配置管理 (Configuration)",
+      "value": "config",
+      "content": "### Configuration\n- **Source**: Load all config from Environment Variables.\n- **Secrets**: Never commit secrets to Git. Use `.env` for local development."
+    },
+    {
+      "label": "Git 提交规范",
+      "value": "git_convention",
+      "content": "### Git Convention\n- **Format**: Conventional Commits (`<type>(<scope>): <subject>`).\n- **Types**: feat, fix, docs, style, refactor, test, chore."
+    }
+  ]
+}

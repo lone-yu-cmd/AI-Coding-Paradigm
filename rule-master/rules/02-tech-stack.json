@@ -1,0 +1,83 @@
+{
+  "id": "tech_stack",
+
+  "title": "技术栈规范",
+  "description": "选择项目使用的核心技术栈 (支持多选)",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "Python",
+      "value": "python",
+      "content": "- **Language**: Python {version}\n- **Framework**: {framework}",
+
+      "inputs": [
+        {
+          "key": "version",
+          "prompt": "Python 版本 (如 3.10+)",
+          "default": "3.10+"
+        },
+        {
+          "key": "framework",
+          "prompt": "Web 框架 (如 FastAPI/Django)",
+          "default": "FastAPI"
+        }
+      ]
+    },
+    {
+      "label": "TypeScript / Node.js",
+      "value": "typescript",
+      "content": "- **Language**: TypeScript {ts_version}\n- **Runtime**: Node.js {node_version}\n- **Framework**: {framework}",
+      "inputs": [
+        {
+          "key": "ts_version",
+          "prompt": "TypeScript 版本",
+          "default": "5.0+"
+        },
+        {
+          "key": "node_version",
+          "prompt": "Node.js 版本",
+          "default": "18+"
+        },
+        {
+          "key": "framework",
+          "prompt": "框架 (如 Next.js/Express)",
+          "default": "Next.js"
+        }
+      ]
+    },
+    {
+      "label": "Go",
+      "value": "go",
+      "content": "- **Language**: Go {version}\n- **Framework**: {framework}",
+      "inputs": [
+        {
+          "key": "version",
+          "prompt": "Go 版本",
+          "default": "1.21+"
+        },
+        {
+          "key": "framework",
+          "prompt": "框架 (如 Gin/Echo)",
+          "default": "Gin"
+        }
+      ]
+    },
+    {
+      "label": "Database (SQL)",
+      "value": "sql_db",
+      "content": "- **Database**: {db_name}\n- **ORM**: {orm}",
+      "inputs": [
+        {
+          "key": "db_name",
+          "prompt": "数据库名称 (如 PostgreSQL)",
+          "default": "PostgreSQL"
+        },
+        {
+          "key": "orm",
+          "prompt": "ORM 库",
+          "default": "SQLAlchemy"
+        }
+      ]
+    }
+  ]
+}

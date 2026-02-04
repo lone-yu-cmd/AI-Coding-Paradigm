@@ -1,0 +1,42 @@
+{
+  "id": "testing_standard",
+  "title": "测试规范",
+  "description": "请选择项目需要的测试类型（支持多选）",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "单元测试 (Unit Test)",
+      "value": "unit_test",
+      "content": "### Unit Testing\n- **Framework**: {framework}\n- **Coverage Goal**: {coverage}%\n- **Strategy**: Mock external dependencies. Test pure logic in isolation.",
+      "inputs": [
+        {
+          "key": "framework",
+          "prompt": "测试框架 (如 Pytest/Jest)",
+          "default": "Pytest"
+        },
+        {
+          "key": "coverage",
+          "prompt": "覆盖率目标 (%)",
+          "default": "80"
+        }
+      ]
+    },
+    {
+      "label": "集成测试 (Integration Test)",
+      "value": "integration_test",
+      "content": "### Integration Testing\n- **Scope**: Test interactions between modules (e.g., API + DB).\n- **Environment**: Use Docker containers for dependencies (Testcontainers)."
+    },
+    {
+      "label": "端到端测试 (E2E)",
+      "value": "e2e_test",
+      "content": "### E2E Testing\n- **Tool**: {tool}\n- **Scope**: Critical user journeys.",
+      "inputs": [
+        {
+          "key": "tool",
+          "prompt": "E2E 工具 (如 Playwright/Cypress)",
+          "default": "Playwright"
+        }
+      ]
+    }
+  ]
+}

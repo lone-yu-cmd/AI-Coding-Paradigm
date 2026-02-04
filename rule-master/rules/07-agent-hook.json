@@ -1,0 +1,42 @@
+{
+  "id": "agent_hook",
+  "title": "Agent Hook (文档维护)",
+  "description": "定义修改代码时需同步维护的文档规则",
+  "type": "multi_select",
+  "options": [
+    {
+      "label": "API 变更同步",
+      "value": "api_sync",
+      "content": "### Documentation Sync\n- **Trigger**: When modifying API endpoints (routes, models).\n- **Action**: Update `{doc_path}` immediately.",
+      "inputs": [
+        {
+          "key": "doc_path",
+          "prompt": "API 文档路径",
+          "default": "docs/api.md"
+        }
+      ]
+    },
+    {
+      "label": "数据库变更同步",
+      "value": "db_sync",
+      "content": "### Documentation Sync\n- **Trigger**: When modifying Database Schema (models, migrations).\n- **Action**: Update `docs/schema.md` and ER Diagram."
+    },
+    {
+      "label": "自定义维护规则",
+      "value": "custom_hook",
+      "content": "### Documentation Sync\n- **Trigger**: {trigger}\n- **Action**: Update `{action}`",
+      "inputs": [
+        {
+          "key": "trigger",
+          "prompt": "触发条件 (如: 修改配置)",
+          "default": "修改配置"
+        },
+        {
+          "key": "action",
+          "prompt": "执行动作 (如: 更新 config.md)",
+          "default": "更新 config.md"
+        }
+      ]
+    }
+  ]
+}

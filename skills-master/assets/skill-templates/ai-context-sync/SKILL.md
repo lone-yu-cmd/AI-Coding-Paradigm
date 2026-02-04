@@ -1,11 +1,6 @@
 ---
 name: "ai-context-sync"
 description: "Intelligent AI context documentation system for projects. Invoke with 'AI Context Sync' to initialize project docs or sync with code changes."
-subagent:
-  name: "doc-maintainer"
-  description: "专门用于文档分析和维护的子智能体，负责分析代码变更对文档的影响并提供更新建议"
-  trigger_condition: "当处理大型项目或批量文档更新时自动调用"
-  fallback: "主 Agent 直接处理"
 ---
 
 # AI Context Sync Skill
@@ -280,6 +275,12 @@ git diff --cached --name-status
 ##### 详细环境检测逻辑
 
 **Subagent 可用性检测**
+
+subagent:
+name: "doc-maintainer"
+description: "专门用于文档分析和维护的子智能体，负责分析代码变更对文档的影响并提供更新建议"
+trigger_condition: "当处理大型项目或批量文档更新时自动调用"
+fallback: "主 Agent 直接处理"
 
 ```python
 # 检测 Subagent 是否已配置并可用
