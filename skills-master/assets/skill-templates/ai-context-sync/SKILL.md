@@ -10,7 +10,7 @@ description: "Intelligent AI context documentation system for projects. Invoke w
 ## 触发方式
 
 - **初始化项目**：`调用 AI Context Sync Skill 帮我初始化项目`
-- **同步文档**：`调用 AI Context Sync Skill 帮我提交代码`
+- **同步文档**：`调用 AI Context Sync Skill 帮我同步项目上下文文档`
 - **快捷触发**：`AI Context Sync`
 
 ---
@@ -92,6 +92,49 @@ ELSE
 - 缓存目录：.cache、__pycache__、.pytest_cache
 - IDE 配置：.idea、.vscode
 
+##### 生成阶段 Subagent（强制优先）
+
+初始化模式的目标是“生成第一版可用的项目逻辑地图”。在多智能体协作流程中，若项目内存在生成阶段 Subagent（`context-bootstrapper`）且 `.aicontextrc.json` 未显式禁用，则主 Agent **必须**在初始化模式 **优先并强制** 委托该 Subagent 产出结构化方案；不得以“直接生成更快”等理由跳过。
+
+**职责边界**
+- `context-bootstrapper` 只负责基于代码现状提出“文档初始化方案”，不直接改写用户的业务代码
+- 主 Agent 负责最终落盘（创建/更新文档文件）、冲突处理与用户交互确认
+
+**输入**
+- 项目目录结构（含关键目录的浅层文件清单）
+- 依赖与运行入口线索（如 `package.json` / `go.mod` / `Cargo.toml` 等）
+- 配置文件（如 `.aicontextrc.json`、`.aicontextignore`，若存在）
+
+**输出**
+- 技术栈结论与证据（命中哪些文件/依赖）
+- 模块候选列表（模块名、路径、职责摘要、入口/路由/导出点线索）
+- 初始化文档生成计划（将创建哪些文件、每个文件的主要章节与关键内容要点）
+- 需要人工确认的点（不确定的模块职责、疑似废弃目录、扫描范围过大等）
+
+**上下文管理规范（context-bootstrapper 强制遵守）**
+- 目标读者：后续任意 AI/开发者在“新对话”中必须能用 1–3 分钟读懂项目
+- 约束：结论必须可追溯到证据（文件路径、关键依赖名、入口文件名等），不允许纯猜测
+- 输出必须稳定：同一项目多次生成的章节结构必须一致，便于增量维护与 diff 审阅
+- 必须显式区分：事实（fact）/推断（inference）/待确认（needs_review）
+
+**固定的项目目录理解格式（context-bootstrapper 输出中的 `doc_plan` 必须遵循）**
+1. MAP.md（项目导航地图）必须包含：
+   - Project Summary（1 段话说明做什么）
+   - Tech Stack（语言/框架/运行时/关键依赖）
+   - Directory Map（核心目录树 + 每个目录职责）
+   - Entry Points（启动入口、路由入口、任务入口）
+   - Module Index（模块表：模块名/路径/职责/入口或导出/依赖）
+   - Key Contracts（对外 API/事件/任务/配置 Schema 的索引）
+   - Runtime & Commands（常用启动/测试/构建命令线索，若可识别）
+   - Risks / NEEDS_REVIEW（不确定点列表）
+2. 每个模块的 `_AI_CONTEXT.md` 必须包含：
+   - Scope（模块边界与不包含内容）
+   - Public Interfaces（导出/对外 API/路由/事件）
+   - Dependencies（上游/下游/关键依赖）
+   - Data Flow（输入→处理→输出）
+   - Config & Flags（本模块相关配置）
+   - Tests（测试位置与覆盖范围线索）
+
 #### Step 2: 创建目录结构
 
 ```
@@ -109,6 +152,8 @@ docs/AI_CONTEXT/
 2. **MAP.md** - 使用 `MAP.template.md`
 3. **模块文档** - 在对应模块目录下创建 `_AI_CONTEXT.md`，使用 `_AI_CONTEXT.template.md`
 
+说明：本文档中所有以 `assets/` 开头的路径均相对本 Skill 的安装目录。
+
 #### Step 4: 询问 Git Hook 安装
 
 ```
@@ -117,7 +162,9 @@ docs/AI_CONTEXT/
 - [N] 否，稍后手动安装
 ```
 
-如果用户选择安装，执行 `scripts/install-hook.sh` 脚本。
+如果用户选择安装：
+- 若当前仓库内存在 `scripts/install-hook.sh`，则执行该脚本
+- 否则提示用户手动在 `.git/hooks/pre-commit` 中加入提醒逻辑（仅提示同步文档，不阻断提交）
 
 ---
 
@@ -131,7 +178,7 @@ docs/AI_CONTEXT/
 
 ```bash
 # 获取未暂存的变更
-git diff HEAD
+git diff
 
 # 获取已暂存的变更
 git diff --cached
@@ -256,17 +303,28 @@ git diff --cached --name-status
 
 ```
 检测顺序：
-1. 检测 Subagent 可用性（Level 3）→ 检查 doc-maintainer Subagent
-2. 检测 AI CLI 工具（Level 2）→ 检测 codebuddy-cli / cursor-cli
+1. 检测 Subagent 可用性（Level 3）→ 检查 doc-maintainer Subagent（如存在）
+2. 检测 AI CLI 工具（Level 2）→ 检测 `ai-cli` 或 `AI_CLI_PATH`
 3. 回退到提示模式（Level 1）→ 默认方案
 ```
 
 ##### Subagent 配置机制
 
-本 Skill 声明了一个可选的 Subagent 配置（见 YAML frontmatter）：
+本 Skill 支持可选的 Subagent，但在多智能体协作流程中存在**强制调度规则**。为避免阶段职责混淆，将 Subagent 能力按阶段拆分：
+- **生成阶段（初始化模式）**：`context-bootstrapper` 负责“从代码生成首版上下文文档方案”
+- **维护阶段（维护模式）**：`doc-maintainer` 负责“基于变更增量更新文档方案”
+
+**强制调度规则**
+- 若 `useSubagent=true` 且存在 `context-bootstrapper`：初始化模式主 Agent **必须**调用该 Subagent；仅在“未安装/不可用/调用失败”时才允许回退
+- 若 `useSubagent=true` 且存在 `doc-maintainer`：维护模式主 Agent **必须**调用该 Subagent；仅在“未安装/不可用/调用失败”时才允许回退
+- 若 `useSubagent=false`：主 Agent **必须**跳过 Subagent，直接执行分析与编辑
 
 | 配置项 | 值 | 说明 |
 |--------|-----|------|
+| name | `context-bootstrapper` | 生成阶段 Subagent 唯一标识 |
+| description | 项目上下文初始化生成专用子智能体 | 职责说明 |
+| trigger_condition | 大型项目或首次生成需高质量 | 何时触发 |
+| fallback | 主 Agent 直接处理 | 不可用时的降级策略 |
 | name | `doc-maintainer` | Subagent 唯一标识 |
 | description | 文档分析和维护专用子智能体 | 职责说明 |
 | trigger_condition | 大型项目或批量更新 | 何时触发 |
@@ -275,7 +333,7 @@ git diff --cached --name-status
 ##### 详细环境检测逻辑
 
 **Subagent 可用性检测**
-检查和当前项目里面是否配置了需要的subagent和用户反馈你能检索到subagent的真实情况
+检查项目内是否存在所需 Subagent 配置，并以实际可检索结果为准
 
 **环境变量支持**
 
@@ -312,7 +370,7 @@ git diff --cached --name-status
 ai-cli context-sync \
   --diff "$(git diff --cached)" \
   --timeout 30 \
-  --non-interactive \  # CI/CD 模式
+  --non-interactive \
   --auto-stage        # 自动暂存更新的文档
 ```
 
@@ -326,52 +384,79 @@ ai-cli context-sync \
 
 ### Level 3: Subagent 辅助模式
 
-当 SKILL.md 中声明的 Subagent（doc-maintainer）可用时：
-- 主 Agent 检测到声明的 Subagent 配置
-- 验证 Subagent 已安装（存在于 subagents-master/ 或 .codebuddy/subagents/）
-- 委托文档分析和更新建议任务给 Subagent
-- 主 Agent 执行最终编辑决策
+当项目内存在对应 Subagent 且 `useSubagent=true` 时，主 Agent **必须**按所处阶段选择并调用委托对象：
+- **初始化模式**：**必须优先** 使用 `context-bootstrapper` 输出“首版文档生成方案”
+- **维护模式**：**必须优先** 使用 `doc-maintainer` 输出“增量更新方案”
 
-##### Subagent 调用流程
+主 Agent 始终负责最终编辑与落盘，避免 Subagent 直接改写文档导致不可控覆盖。
+
+##### 初始化模式委托流程（context-bootstrapper）
 
 ```
 主 Agent 接收用户请求
   ↓
-读取 SKILL.md frontmatter 中的 subagent 配置
-  ↓
-检查 Subagent 可用性（调用 check_subagent_availability）
+检查项目内是否存在 context-bootstrapper Subagent
   ↓
 IF 可用 THEN
-  调用 use_sub_agent 工具，委托任务
-  接收 Subagent 返回的分析结果
-  主 Agent 根据结果执行文档编辑
+  委托其产出首版文档生成方案（结构化输出）
+  主 Agent 根据方案创建 docs/AI_CONTEXT/ 下的文件
+ELSE
+  输出提示："Subagent context-bootstrapper 未安装，回退到主 Agent 处理"
+  主 Agent 直接执行扫描并生成首版文档
+```
+
+##### 维护模式委托流程（doc-maintainer）
+
+```
+主 Agent 接收用户请求
+  ↓
+检查项目内是否存在 doc-maintainer Subagent
+  ↓
+IF 可用 THEN
+  委托其产出增量更新建议（结构化输出）
+  主 Agent 根据建议仅更新受影响的文档片段
 ELSE
   输出提示："Subagent doc-maintainer 未安装，回退到主 Agent 处理"
-  主 Agent 直接执行分析和编辑
+  主 Agent 直接分析并更新文档
 ```
 
-##### Subagent 调用格式
+##### Subagent 输入输出约定
 
 ```
-使用 use_sub_agent 工具调用：
-- name: "doc-maintainer"
-- message: |
-    请分析以下代码变更对项目文档的影响：
-    
-    ## 变更内容
-    <git diff 输出>
-    
-    ## 现有文档
-    <docs/AI_CONTEXT/ 目录结构>
-    
-    ## 配置信息
-    <.aicontextrc.json 内容>
-    
-    请返回：
-    1. 需要更新的文档列表
-    2. 每个文档的具体更新建议
-    3. 是否需要创建新文档
+给 context-bootstrapper 的输入建议包含：
+- 项目目录结构（按需截断）
+- 关键依赖文件内容摘要（按需截断）
+- 现有配置（.aicontextrc.json / .aicontextignore，如存在）
+
+输出建议包含：
+1. 技术栈结论与证据
+2. 模块候选列表（路径、职责、入口/导出线索）
+3. docs/AI_CONTEXT/ 生成计划（文件清单与每个文件要点）
+4. NEEDS_REVIEW 列表（不确定点与原因）
+
+给 doc-maintainer 的输入建议包含：
+- 变更内容（优先 `git diff --cached`，必要时补充未暂存 diff）
+- 现有文档结构（docs/AI_CONTEXT/ 目录与关键文件摘要）
+- 配置信息（.aicontextrc.json，如存在）
+
+返回建议包含：
+1. 需要更新的文档列表
+2. 每个文档的具体更新建议
+3. 是否需要创建新文档
 ```
+
+##### 阶段衔接方式
+
+- 生成阶段（context-bootstrapper）输出的 `doc_plan` 由主 Agent 落盘为 docs/AI_CONTEXT/ 的首版文档，形成后续维护的“基线”
+- 维护阶段（doc-maintainer）以该基线为输入之一，只对受影响文档做增量更新，并遵守 AUTO_SYNC / MANUAL 区块边界，避免覆盖人工编辑内容
+
+##### 生成阶段缺失 Subagent 的风险与影响
+
+生成阶段不配置 `context-bootstrapper` 也能工作，但在中大型项目中常见风险包括：
+- 首版 MAP/_RULES 结构不稳，后续维护成本升高（需要反复重写而非增量更新）
+- 模块边界与命名不一致，导致 `_AI_CONTEXT.md` 分布混乱、检索成本变高
+- 扫描范围控制不当（漏掉关键目录或把大量非核心目录纳入），生成内容噪声大
+- 不确定项未被集中标记，造成“看似完整但实际误导”的上下文，影响后续开发决策
 
 ##### doc-maintainer Subagent 规范
 
@@ -382,23 +467,67 @@ ELSE
 name: doc-maintainer
 description: 专门用于文档分析和维护的子智能体，负责分析代码变更对文档的影响并提供更新建议
 prompt: |
-  你是一个专业的文档维护专家，专注于分析代码变更并维护项目文档的一致性。
-  
-  你的职责：
-  1. 分析 git diff 输出，识别代码变更类型
-  2. 判断变更对现有文档的影响
-  3. 提供具体的文档更新建议
-  4. 识别需要创建新文档的场景
-  
-  你应该关注：
-  - 模块职责变化
-  - 接口签名变更
-  - 依赖关系变化
-  - 文件结构调整
-  - 配置项变更
-  
-  返回格式要求：
-  使用结构化的 JSON 格式返回分析结果
+  你是一个专业的文档维护专家，专注于分析代码变更并维护项目上下文文档的一致性与可维护性。
+
+  强制调度要求：
+  - 在维护模式中，只要系统可调度你且未被显式禁用，你必须被调用；主 Agent 不得跳过你的分析直接改写文档
+
+  你的职责（必须完成）：
+  1. 解析 diff，识别变更类型与影响范围
+  2. 对照现有 docs/AI_CONTEXT/，给出增量更新建议（禁止整文件重写作为默认方案）
+  3. 强制区分 AUTO_SYNC 与 MANUAL：任何建议必须说明修改落点，且不得建议覆盖 MANUAL 区块
+  4. 识别需要新增/拆分/归档的文档与原因，并给出可执行的更新步骤
+
+  你必须关注（至少覆盖）：
+  - 模块职责变化、公共接口/路由/导出变化
+  - 依赖关系变化（新增/删除/替换依赖）
+  - 文件结构调整（移动/重命名/删除）
+  - 配置项变更（新增字段、默认值变化、schema 演进）
+
+  输出必须是严格 JSON（不得输出 markdown），字段必须包含：
+  - impact_level: "high"|"medium"|"low"
+  - updates: [{ "file": "...", "action": "update"|"create"|"archive", "sections": ["..."], "summary": "...", "patch_hints": ["..."], "needs_review": ["..."] }]
+  - skipped: [{ "file": "...", "reason": "..." }]
+  - risks: ["..."]
+  - questions: ["..."]
+tools: []
+mcp: []
+knowledge: []
+```
+
+##### context-bootstrapper Subagent 规范
+
+如需创建此 Subagent，应包含以下定义：
+
+```yaml
+# subagents-master/context-bootstrapper/subagent.md
+name: context-bootstrapper
+description: 专门用于初始化生成项目上下文文档方案的子智能体，负责扫描项目并产出结构化的首版文档生成计划
+prompt: |
+  你是一个专业的项目上下文建模专家，专注于从代码与目录结构中抽取“模块地图”和“关键契约”，用于初始化生成 AI 可读、可维护的项目上下文文档。
+
+  强制调度要求：
+  - 在初始化模式中，只要系统可调度你且未被显式禁用，你必须被调用；主 Agent 不得跳过你的方案直接生成首版文档
+
+  上下文管理规范（必须遵守）：
+  1. 你的输出必须面向“后续 AI 快速接手”：稳定结构、明确边界、可追溯证据
+  2. 必须把结论分为：fact / inference / needs_review，并给出 evidence
+  3. 必须产出固定的目录理解格式，确保 MAP.md 与模块文档结构一致
+
+  你的职责（必须完成）：
+  1. 识别技术栈与入口（启动入口/路由入口/任务入口），并提供证据
+  2. 生成模块候选列表：模块职责、路径、入口/路由/导出点、上下游依赖
+  3. 生成 docs/AI_CONTEXT/ 首版文档计划：文件清单 + 每个文件的章节要点（必须匹配模板结构）
+  4. 输出 NEEDS_REVIEW：所有不确定点、风险、建议的确认方式
+
+  输出必须是严格 JSON（不得输出 markdown），字段必须包含：
+  - tech_stack: { "languages": [], "frameworks": [], "runtime": [], "evidence": [] }
+  - entry_points: [{ "type": "app"|"router"|"worker"|"cli", "path": "...", "evidence": "..." }]
+  - directory_map: [{ "path": "...", "role": "...", "notes": "...", "evidence": "..." }]
+  - modules: [{ "name": "...", "path": "...", "responsibility": "...", "interfaces": [], "deps": [], "evidence": [], "needs_review": [] }]
+  - doc_plan: [{ "file": "docs/AI_CONTEXT/MAP.md"|"docs/AI_CONTEXT/_RULES.md"|".../_AI_CONTEXT.md", "sections": ["..."], "key_points": ["..."] }]
+  - needs_review: [{ "item": "...", "reason": "...", "how_to_verify": "..." }]
+  - risks: ["..."]
 tools: []
 mcp: []
 knowledge: []
@@ -427,8 +556,8 @@ IF Level 2 失败 THEN 回退 Level 1
 
 **配置驱动的优势**
 
-1. **声明式配置**：Subagent 配置在 SKILL.md frontmatter 中声明，便于查看和维护
-2. **灵活调整**：可通过 `.aicontextrc.json` 的 `useSubagent: false` 禁用 Subagent
+1. **职责可见**：生成与维护阶段的 Subagent 命名与输入输出约定在本文档中声明
+2. **灵活调整**：可通过 `.aicontextrc.json` 的 `useSubagent` 开关禁用 Subagent
 3. **自动检测**：无需修改核心逻辑，只需安装/卸载 Subagent 即可切换模式
 4. **独立更新**：Subagent 可独立升级，不影响主 Skill 逻辑
 
@@ -584,6 +713,7 @@ Skill 读取项目根目录下的 `.aicontextrc.json` 配置文件：
 
 ```json
 {
+  "useSubagent": true,
   "modulePaths": ["src/*", "lib/*"],
   "ignorePaths": ["node_modules", "dist", "build", ".git"],
   "docLanguage": "zh-CN",
@@ -596,7 +726,7 @@ Skill 读取项目根目录下的 `.aicontextrc.json` 配置文件：
 }
 ```
 
-配置项说明见 `assets/config/.aicontextrc.template.json`。
+上方为示例配置，可按项目规模与目录结构裁剪。
 
 ---
 
@@ -628,6 +758,3 @@ Skill 读取项目根目录下的 `.aicontextrc.json` 配置文件：
 ## 相关资源
 
 - 模板文件：`assets/templates/`
-- 配置模板：`assets/config/`
-- Hook 脚本：`scripts/hooks/`
-- 安装脚本：`scripts/install-hook.sh`
