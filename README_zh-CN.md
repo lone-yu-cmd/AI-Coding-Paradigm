@@ -117,6 +117,7 @@ Subagents-Master 使你能够创建和管理专业化的 AI 子智能体，处�
 | **requirements-analysis** | 需求分析文档创建技能。当用户告知"需要开始一个新需求"时触发。该技能会创建 .requirementsAnalysis 文件夹、更新 .gitignore、按序号命名创建需求目录，并生成包含需求背景、需求内容、代码实施计划的需求文档。完成后与用户确认内容，确认后开始代码实施。 |
 | **playwright-analyze-page** | 连接调试版Chrome浏览器，分析当前页面的DOM结构、交互元素和CSS样式信息 |
 | **ai-context-sync** | Intelligent AI context documentation system for projects. Invoke with 'AI Context Sync' to initialize project docs or sync with code changes. |
+| **ai_context_requirements-analysis** | Context-aware requirements analysis skill. Automatically triggered when users request to complete specific requirements by reading existing AI documents or AI_CONTEXT documentation. The skill intelligently identifies scenario types and reads relevant documentation. |
 
 ---
 
