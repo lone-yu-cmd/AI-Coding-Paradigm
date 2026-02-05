@@ -119,6 +119,7 @@ These three modules work together to create a powerful AI development ecosystem:
 | **playwright-analyze-page** | 连接调试版Chrome浏览器，分析当前页面的DOM结构、交互元素和CSS样式信息 |
 | **ai-context-sync** | Intelligent AI context documentation system for projects. Invoke with 'AI Context Sync' to initialize project docs or sync with code changes. |
 | **ai_context_requirements-analysis** | Context-aware requirements analysis skill. Automatically triggered when users request to complete specific requirements by reading existing AI documents or AI_CONTEXT documentation. The skill intelligently identifies scenario types and reads relevant documentation. |
+| **update-skills-master** | Pull latest skills-master from GitHub using sparse checkout. Auto-detects target directory and works universally across different project structures. |
 
 ---
 
