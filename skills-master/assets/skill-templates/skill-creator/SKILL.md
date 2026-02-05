@@ -46,6 +46,10 @@ A valid SKILL requires:
 4.  **Installation Instructions**:
     *   The skill's `SKILL.md` MUST include an "Installation" section that explicitly explains the `${SKILL_DIR}` mechanism.
 
+5.  **Portability Check**:
+    *   Before finalizing a skill, verify it can work in different project locations without path modifications.
+    *   Test: Move the skill to a different directory and ensure all paths still resolve correctly.
+
 ## SKILL.md Format
 
 ```markdown
@@ -66,6 +70,27 @@ The `${SKILL_DIR}` placeholder represents the absolute path to this skill's dire
 Example: `python3 ${SKILL_DIR}/scripts/main.py`
 ```
 
+## Path Usage Examples
+
+**✅ CORRECT - Using Relative Paths:**
+
+Run the script:
+\`\`\`bash
+python3 ${SKILL_DIR}/scripts/run.py
+\`\`\`
+
+Configuration file: `${SKILL_DIR}/config/settings.json`
+```
+
+**❌ WRONG - Using Absolute Paths:**
+```markdown
+# DON'T: Absolute paths in documentation
+Run the script:
+\`\`\`bash
+python3 /Users/username/project/skills/my-skill/scripts/run.py
+\`\`\`
+```
+
 ## Creation Steps
 
 1. Ask user for skill name and purpose
@@ -78,7 +103,12 @@ Example: `python3 ${SKILL_DIR}/scripts/main.py`
    - Generate `SKILL.md` with proper frontmatter
    - Update the global skills index (`README.md`)
 4. Validate the structure is correct
-5. **Verify Cross-IDE Compatibility**: Ensure the skill works in different IDEs (VS Code, Antigravity, codebuddy, PyCharm) without path errors.
+5. **Path Verification Checklist**:
+   - ✅ All paths in SKILL.md use `${SKILL_DIR}` placeholder
+   - ✅ Python scripts use `os.path.dirname(__file__)` for path detection
+   - ✅ No hardcoded absolute paths anywhere
+   - ✅ Configuration files use relative paths
+6. **Verify Cross-IDE Compatibility**: Ensure the skill works in different IDEs (VS Code, Antigravity, codebuddy, PyCharm) without path errors.
 
 ## Example
 
