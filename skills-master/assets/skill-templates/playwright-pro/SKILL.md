@@ -22,18 +22,27 @@ description: "增强版 Playwright 页面分析工具：MUST 通过 CDP 连接�
 
 ### 为什么必须用 CDP 连接本地浏览器？
 
-- **保留登录态**：Cookie、Session、Token 等认证信息保存在本地浏览器 Profile 中，CDP 连接直接复用
+- **保留登录态**：Cookie、Session、Token 等认证信息通过克隆用户 Profile 保留
 - **保留账号信息**：Google、GitHub、各类 SaaS 平台登录态均保留
-- **保留浏览器扩展**：已安装的扩展在 CDP 连接时保持可用
+- **保留浏览器扩展**：已安装的扩展在克隆的 Profile 中保持可用
 - **真实用户环境**：分析用户真实浏览环境下的页面，而非无状态的干净浏览器
+
+### Profile 克隆机制
+
+Chrome 安全限制：使用默认 data directory 时会拒绝启用远程调试端口。`launch-chrome.sh` 通过以下方式解决：
+1. 自动检测用户最近使用的 Chrome Profile
+2. 将 Profile 的关键文件（Cookies、Login Data、Extensions 等）克隆到独立目录 `~/.playwright-pro-clone-chrome/`
+3. 使用克隆目录启动 Chrome，既保留登录态又能启用调试端口
+4. 注意：在调试浏览器中的新登录/修改**不会**同步回用户原 Profile
 
 ### 为什么 NEVER 自行拼接 Chrome 启动命令？
 
 手动拼接 `"/Applications/Google Chrome.app/..." --remote-debugging-port=9222` 会遇到以下问题：
+- **Chrome 安全限制**：使用默认 data directory 时，Chrome 拒绝启用远程调试端口
+- **Profile Picker 阻塞**：多 Profile 用户会弹出选择页面，不启用调试端口
 - **singleton lock**：Chrome 已有实例运行时，新进程会因 lock 文件而无法正确启用调试端口
 - **端口始终不监听**：即使启动命令看起来正确，端口也可能因为 profile 冲突而永远无法就绪
 - **缺少等待和重试逻辑**：需要正确等待浏览器初始化完成后端口才可用
-- **缺少进程冲突检测**：需要先检测是否有已运行的 Chrome 实例占用资源
 
 `launch-chrome.sh` 脚本已处理以上所有边界情况，**MUST** 使用它来启动浏览器。
 

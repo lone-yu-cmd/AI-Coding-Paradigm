@@ -458,29 +458,26 @@ echo "🚀 正在以调试模式启动 $BROWSER_DISPLAY_NAME..."
 LAUNCH_ARGS=("--remote-debugging-port=$DEBUG_PORT")
 
 if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
-    PROFILE_DIR=$(get_default_profile_dir "$BROWSER_TYPE")
-    echo "📁 使用用户数据目录: $PROFILE_DIR"
+    SOURCE_PROFILE_DIR=$(get_default_profile_dir "$BROWSER_TYPE")
     
-    # 确定 --profile-directory 参数
+    # 确定要使用的 profile 子目录
     if [[ -n "$PROFILE_NAME" ]]; then
-        # 用户显式指定了 profile
-        if [[ ! -d "$PROFILE_DIR/$PROFILE_NAME" ]]; then
-            echo "❌ 指定的 profile 不存在: $PROFILE_DIR/$PROFILE_NAME"
+        if [[ ! -d "$SOURCE_PROFILE_DIR/$PROFILE_NAME" ]]; then
+            echo "❌ 指定的 profile 不存在: $SOURCE_PROFILE_DIR/$PROFILE_NAME"
             echo ""
             echo "   可用的 profile:"
-            list_profiles "$PROFILE_DIR"
+            list_profiles "$SOURCE_PROFILE_DIR"
             exit 1
         fi
         SELECTED_PROFILE="$PROFILE_NAME"
     else
-        # 自动检测最近使用的 profile
-        SELECTED_PROFILE=$(detect_recent_profile "$PROFILE_DIR")
+        SELECTED_PROFILE=$(detect_recent_profile "$SOURCE_PROFILE_DIR")
     fi
     
     echo "👤 使用 profile: $SELECTED_PROFILE"
     
-    # 显示 profile 中的用户名（如果能提取到）
-    PREF_FILE="$PROFILE_DIR/$SELECTED_PROFILE/Preferences"
+    # 显示 profile 中的用户名
+    PREF_FILE="$SOURCE_PROFILE_DIR/$SELECTED_PROFILE/Preferences"
     if [[ -f "$PREF_FILE" ]]; then
         PROFILE_USER_NAME=$(grep -o '"name":"[^"]*"' "$PREF_FILE" 2>/dev/null | head -1 | cut -d'"' -f4)
         if [[ -n "$PROFILE_USER_NAME" ]]; then
@@ -488,12 +485,59 @@ if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
         fi
     fi
     
-    echo ""
-    echo "⚠️  注意: 使用默认 profile 时，调试工具可以访问您的所有浏览器数据"
-    echo "   请确保在受信任的环境中使用"
+    # Chrome 安全限制：使用默认 data directory 时拒绝启用远程调试端口
+    # 解决方案：克隆用户 profile 的关键文件到独立 data directory
+    # 这样既能保留登录态（Cookies、Session 等），又能启用调试端口
+    CLONE_DIR="$HOME/.playwright-pro-clone-$BROWSER_TYPE"
+    CLONE_PROFILE_DIR="$CLONE_DIR/Default"
     
-    LAUNCH_ARGS+=("--user-data-dir=$PROFILE_DIR")
-    LAUNCH_ARGS+=("--profile-directory=$SELECTED_PROFILE")
+    echo ""
+    echo "📋 正在同步 profile 数据（保留登录态）..."
+    
+    mkdir -p "$CLONE_PROFILE_DIR"
+    
+    # 复制关键文件（登录态、扩展、配置等），跳过缓存等大文件
+    PROFILE_FILES=(
+        "Cookies"
+        "Login Data"
+        "Web Data"
+        "Preferences"
+        "Secure Preferences"
+        "Bookmarks"
+        "Local Storage"
+        "Session Storage"
+        "IndexedDB"
+        "Extensions"
+        "Extension State"
+        "Extension Rules"
+        "Extension Scripts"
+    )
+    
+    SOURCE_DIR="$SOURCE_PROFILE_DIR/$SELECTED_PROFILE"
+    COPY_COUNT=0
+    
+    for f in "${PROFILE_FILES[@]}"; do
+        if [[ -e "$SOURCE_DIR/$f" ]]; then
+            # 使用 rsync 增量同步（如果可用），否则用 cp
+            if command -v rsync &>/dev/null; then
+                rsync -a --delete "$SOURCE_DIR/$f" "$CLONE_PROFILE_DIR/" 2>/dev/null
+            else
+                rm -rf "$CLONE_PROFILE_DIR/$f" 2>/dev/null
+                cp -a "$SOURCE_DIR/$f" "$CLONE_PROFILE_DIR/" 2>/dev/null
+            fi
+            ((COPY_COUNT++))
+        fi
+    done
+    
+    # 复制 Local State（在 user-data-dir 根目录）
+    if [[ -f "$SOURCE_PROFILE_DIR/Local State" ]]; then
+        cp -a "$SOURCE_PROFILE_DIR/Local State" "$CLONE_DIR/" 2>/dev/null
+    fi
+    
+    echo "   ✅ 已同步 $COPY_COUNT 项数据"
+    
+    LAUNCH_ARGS+=("--user-data-dir=$CLONE_DIR")
+    LAUNCH_ARGS+=("--profile-directory=Default")
 else
     PROFILE_DIR="$HOME/.playwright-pro-debug-profile-$BROWSER_TYPE"
     mkdir -p "$PROFILE_DIR"
@@ -519,7 +563,8 @@ for i in {1..15}; do
         echo "   例如: node connect-cdp.js"
         if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
             echo ""
-            echo "💡 使用默认 profile，所有登录态和扩展均已可用"
+            echo "💡 已克隆用户 profile，登录态和扩展均已可用"
+            echo "   注意: 在此浏览器中的新登录/修改不会同步回原 profile"
         fi
         exit 0
     fi
