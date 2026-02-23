@@ -43,14 +43,14 @@ skills-master/
 └── assets/                           # 资源目录
     └── skill-templates/              # 标准技能模板库（13个）
         ├── add-in-skills-master/     # 添加/更新技能到库
-        ├── ai-context-sync/          # AI 上下文文档系统
+        ├── context-ai-sync/          # AI 上下文文档系统
         ├── auto-committer/           # 自动化 Git 提交
-        ├── code-explainer/           # 代码分析报告生成
+        ├── context-code-explainer/           # 代码分析报告生成
         ├── code-review/              # 代码审查
         ├── context-aware-coding/     # 上下文感知编码
         ├── git-diff-requirement/     # Git Diff 需求分析
         ├── playwright-analyze-page/  # 页面结构分析
-        ├── project-analyzer/         # 项目分析器
+        ├── context-project-analyzer/         # 项目分析器
         ├── requirements-analysis/    # 需求分析文档创建
         ├── skill-creator/            # 技能创建器
         └── subagent-creator/         # 子智能体创建器
@@ -182,14 +182,14 @@ python3 skills/skills-master/scripts/install.py --all
 
 #### 🛠️ 开发工具类
 - **auto-committer**: 自动化 Git 提交，生成规范的提交信息
-- **code-explainer**: 生成结构化的代码分析报告
+- **context-code-explainer**: 生成结构化的代码分析报告
 - **code-review**: 代码审查，检查业务正确性和逻辑缺陷
 - **git-diff-requirement**: 分析代码变更是否符合需求
 
 #### 📝 文档管理类
-- **ai-context-sync**: AI 上下文文档系统，自动同步项目文档
+- **context-ai-sync**: AI 上下文文档系统，自动同步项目文档
 - **context-aware-coding**: 管理 `AI_README.md`，实施上下文优先架构
-- **project-analyzer**: 为新/遗留项目生成引导文档
+- **context-project-analyzer**: 为新/遗留项目生成引导文档
 - **requirements-analysis**: 创建需求分析文档
 
 #### 🏗️ 架构设计类
@@ -204,9 +204,9 @@ python3 skills/skills-master/scripts/install.py --all
 
 | 频率 | 技能列表 |
 |-----|---------|
-| 高频 | `auto-committer`, `code-review`, `ai-context-sync` |
-| 中频 | `requirements-analysis`, `git-diff-requirement`, `code-explainer` |
-| 低频 | `project-analyzer`, `skill-creator`, `subagent-creator` |
+| 高频 | `auto-committer`, `code-review`, `context-ai-sync` |
+| 中频 | `requirements-analysis`, `git-diff-requirement`, `context-code-explainer` |
+| 低频 | `context-project-analyzer`, `skill-creator`, `subagent-creator` |
 | 按需 | `playwright-analyze-page`, `add-in-skills-master` |
 
 <!-- MANUAL_END -->
@@ -229,15 +229,15 @@ python3 skills/skills-master/scripts/install.py --list
 # 输出示例：
 # Available Skill Templates:
 # - add-in-skills-master
-# - ai-context-sync
+# - context-ai-sync
 # - auto-committer
 # ...
 
 # 3. 安装特定技能
-python3 skills/skills-master/scripts/install.py --name ai-context-sync
+python3 skills/skills-master/scripts/install.py --name context-ai-sync
 
 # 输出示例：
-# Successfully installed skill: ai-context-sync
+# Successfully installed skill: context-ai-sync
 ```
 
 ### 高级用法：批量安装和验证

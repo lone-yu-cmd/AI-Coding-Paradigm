@@ -30,7 +30,7 @@
 
 **通用的 AI 辅助开发技能管理器**
 
-Skills-Master 作为 AI 技能生态系统的包管理器，允许开发者轻松地在不同项目中安装、更新和管理“标准技能”库。
+Skills-Master 作为 AI 技能生态系统的包管理器，允许开发者轻松地在不同项目中安装、更新和管理"标准技能"库。
 
 **核心特性：**
 - 📦 **集中式技能仓库**：精选的13+标准技能集合，即装即用
@@ -105,8 +105,8 @@ Subagents-Master 使你能够创建和管理专业化的 AI 子智能体，处�
 | 技能名称 | 描述 |
 | :--- | :--- |
 | **auto-committer** | 自动化 Git 提交，包含变更日志更新和语义化消息。 |
-| **code-explainer** | 为复杂逻辑生成结构化的代码分析报告。 |
-| **project-analyzer** | 为新项目或遗留项目引导“上下文优先”的文档。 |
+| **context-code-explainer** | 生成结构化的代码分析报告，具备 AI_CONTEXT 感知能力。 |
+| **context-project-analyzer** | 为新项目或遗留项目引导 AI_CONTEXT 文档初始化。 |
 | **skill-creator** | 一个工具，用于轻松创建具有标准目录结构的新技能。 |
 | **add-in-skills-master** | Adds or updates skill templates in the skills-master library. Invoke when user wants to contribute a new skill to the master library. |
 | **context-aware-coding** | 管理 `AI_README.md` 并强制执行架构上下文。 |
@@ -115,8 +115,8 @@ Subagents-Master 使你能够创建和管理专业化的 AI 子智能体，处�
 | **code-review** | Code review skill. Triggered when user says 'I have completed this requirement, please review my code'. Analyzes git diff HEAD changes, checks business correctness against requirement documents, identifies logic defects or implementation errors, and provides detailed review feedback and suggestions. |
 | **requirements-analysis** | 需求分析文档创建技能。当用户告知"需要开始一个新需求"时触发。该技能会创建 .requirementsAnalysis 文件夹、更新 .gitignore、按序号命名创建需求目录，并生成包含需求背景、需求内容、代码实施计划的需求文档。完成后与用户确认内容，确认后开始代码实施。 |
 | **playwright-analyze-page** | 连接调试版Chrome浏览器，分析当前页面的DOM结构、交互元素和CSS样式信息 |
-| **ai-context-sync** | Intelligent AI context documentation system for projects. Invoke with 'AI Context Sync' to initialize project docs or sync with code changes. |
-| **ai_context_requirements-analysis** | Context-aware requirements analysis skill. Automatically triggered when users request to complete specific requirements by reading existing AI documents or AI_CONTEXT documentation. The skill intelligently identifies scenario types and reads relevant documentation. |
+| **context-ai-sync** | 智能 AI 上下文文档系统。使用 'AI Context Sync' 初始化项目文档或同步代码变更。 |
+| **context-requirements-analysis** | 上下文感知需求分析技能。自动读取 AI 文档或 AI_CONTEXT 文档完成需求分析。 |
 | **update-skills-master** | Pull latest skills-master from GitHub using sparse checkout. Auto-detects target directory and works universally across different project structures. |
 | **codebuddy-speckit-summary** | Extends the Speckit pipeline with a Feature Registry system. This skill should be used when working with Speckit commands (speckit.specify, speckit.plan, speckit.implement) to maintain a centralized feature index. It adds a speckit.summarize command for archiving completed features and injects REGISTRY.md awareness into existing Speckit commands via a project rule. |
 
@@ -146,7 +146,7 @@ ai-coding-paradigm/
 └── docs/              # 文档
 ```
 
-**对于 Skills-Master**：复制或符号链接 `skills-master` 目录到你的 IDE skills 目录，然后告诉 AI 助手：“Skills-Master 有哪些技能？”或“调用 skills-master 帮我安装 auto-committer”。
+**对于 Skills-Master**：复制或符号链接 `skills-master` 目录到你的 IDE skills 目录，然后告诉 AI 助手："Skills-Master 有哪些技能？"或"调用 skills-master 帮我安装 auto-committer"。
 
 **对于 Rule-Master**：使用规则生成工具为你的项目创建标准化规则。
 
@@ -156,7 +156,7 @@ ai-coding-paradigm/
 
 如果你正在将 AI-Coding-Paradigm 集成到现有项目中：
 
-1.  **初始化文档**：使用 **ai-context-sync** 技能生成 AI 上下文文档（`docs/AI_CONTEXT/`）。
+1.  **初始化文档**：使用 **context-ai-sync** 技能生成 AI 上下文文档（`docs/AI_CONTEXT/`）。
 2.  **定义规则**：使用 **rule-master** 建立编码标准和 AI 交互指南。
 3.  **安装核心技能**：我们 **强烈推荐** 安装 **auto-committer** 和 **context-aware-coding** 用于自动化工作流。
 4.  **创建子智能体**：使用 **subagent-creator** 为复杂的领域特定任务构建专业化智能体。

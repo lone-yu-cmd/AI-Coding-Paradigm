@@ -1,5 +1,5 @@
 ---
-name: "code-explainer"
+name: "context-code-explainer"
 description: "Generates a structured analysis report for a given code snippet. Invoke when user asks to explain, understand, or analyze specific code."
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: ai_context_requirements-analysis
+name: context-requirements-analysis
 description: Context-aware requirements analysis skill. Automatically triggered when users request "to complete specific requirements by reading existing AI documents or AI_CONTEXT documentation". The skill intelligently identifies scenario types (new AI session, develop new feature, fix bug, refactor code), reads relevant documentation, executes requirements, and updates documentation accordingly.
 ---
 

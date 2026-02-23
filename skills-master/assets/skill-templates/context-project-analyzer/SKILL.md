@@ -1,5 +1,5 @@
 ---
-name: "project-analyzer"
+name: "context-project-analyzer"
 description: "Scans project structure to infer technology stack and architecture, then generates AI-optimized Context-First documentation. Invoke when initializing a new project or refreshing docs."
 ---
 
@@ -17,7 +17,7 @@ Bootstraps **Context-First Architecture** for any project by analyzing structure
 
 ### Step 1: Run Analysis
 ```bash
-python3 skills/project-analyzer/scripts/analyze.py
+python3 skills/context-project-analyzer/scripts/analyze.py
 ```
 
 ### Step 2: Review & Refine

@@ -1,5 +1,5 @@
 ---
-name: "ai-context-sync"
+name: "context-ai-sync"
 description: "Intelligent AI context documentation system for projects. Invoke with 'AI Context Sync' to initialize project docs or sync with code changes."
 ---
 

@@ -48,7 +48,7 @@ python3 skills/auto-committer/scripts/manage_changelog.py add --type <type> --me
 
 Analyze project structure:
 ```bash
-python3 skills/project-analyzer/scripts/analyze.py
+python3 skills/context-project-analyzer/scripts/analyze.py
 ```
 
 ### Rule-Master Commands
@@ -189,7 +189,7 @@ Each subagent's `subagent.md` contains:
 
 ### Context-First Documentation Strategy
 
-Several skills (`project-analyzer`, `context-aware-coding`, `ai-context-sync`) implement a documentation pattern:
+Several skills (`context-project-analyzer`, `context-aware-coding`, `context-ai-sync`) implement a documentation pattern:
 - `docs/AI_CONTEXT/` contains AI-optimized documentation
 - Uses semantic keywords: MUST/NEVER/PREFER
 - Avoids ASCII art, tree diagrams, visual decorations
@@ -206,7 +206,7 @@ The three core modules work together:
 ## Important Skills
 
 ### Essential for New Projects
-- **project-analyzer**: Bootstrap documentation (run first)
+- **context-project-analyzer**: Bootstrap documentation (run first)
 - **context-aware-coding**: Maintain AI_README.md and architecture docs
 - **auto-committer**: Automate commit workflow with changelog updates
 
@@ -218,15 +218,15 @@ The three core modules work together:
 ### Code Quality
 - **code-review**: Analyze git diff HEAD against requirements
 - **git-diff-requirement**: Detect defects in code changes
-- **code-explainer**: Generate structured code analysis reports
+- **context-code-explainer**: Generate structured code analysis reports
 
 ### Requirements Management
 - **requirements-analysis**: Create structured requirement documents in `.requirementsAnalysis/`
-- **ai_context_requirements-analysis**: Context-aware requirements analysis with AI_CONTEXT documentation
+- **context-requirements-analysis**: Context-aware requirements analysis with AI_CONTEXT documentation
 
 ### Specialized Analysis
 - **playwright-analyze-page**: Connect to Chrome DevTools, analyze page DOM, interactions, and CSS
-- **ai-context-sync**: Intelligent AI context documentation system
+- **context-ai-sync**: Intelligent AI context documentation system
 
 ### Subagent Creation
 - **subagent-creator**: Interactive wizard for creating subagent configurations
@@ -276,7 +276,7 @@ When starting a new conversation in this repository, you MUST:
    - `docs/AI_CONTEXT/CONSTITUTION.md` - Project rules and conventions
    
 2. **If Context Documentation Missing**:
-   - Run `python3 skills/project-analyzer/scripts/analyze.py` to generate it
+   - Run `python3 skills/context-project-analyzer/scripts/analyze.py` to generate it
    - Then read the generated files before proceeding
 
 3. **Exception**: Skip context loading ONLY if the user explicitly requests a quick, isolated task
