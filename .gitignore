@@ -1,16 +1,21 @@
+# mac
 **/.DS_Store
+
+# Idea command
 .codebuddy/
 .idea/
 .trae/
-*.zip
 
+
+# specs
 specs/
-tmp/
+.specify
 
 
 # docs
 CLAUDE.md
 docs
+*.zip
 
 # scripts
 scripts/
@@ -27,5 +32,5 @@ debug-output
 
 # generate file
 **rule.md
-
+tmp/
 .aicontext*
