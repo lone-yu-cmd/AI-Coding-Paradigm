@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- skills-master: remove spec-kit-workflow skill
+
 ### Fixed
 - skills-master: update codebuddy-speckit-summary skill
 

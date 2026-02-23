@@ -53,7 +53,6 @@ skills-master/
         ├── project-analyzer/         # 项目分析器
         ├── requirements-analysis/    # 需求分析文档创建
         ├── skill-creator/            # 技能创建器
-        ├── spec-kit-workflow/        # Spec-Kit 工作流
         └── subagent-creator/         # 子智能体创建器
 ```
 
@@ -194,7 +193,6 @@ python3 skills/skills-master/scripts/install.py --all
 - **requirements-analysis**: 创建需求分析文档
 
 #### 🏗️ 架构设计类
-- **spec-kit-workflow**: Spec 驱动开发（Specify → Plan → Tasks → Implement）
 - **skill-creator**: 创建新技能并维护索引
 - **subagent-creator**: 生成子智能体配置文档
 
@@ -209,7 +207,7 @@ python3 skills/skills-master/scripts/install.py --all
 | 高频 | `auto-committer`, `code-review`, `ai-context-sync` |
 | 中频 | `requirements-analysis`, `git-diff-requirement`, `code-explainer` |
 | 低频 | `project-analyzer`, `skill-creator`, `subagent-creator` |
-| 按需 | `playwright-analyze-page`, `spec-kit-workflow`, `add-in-skills-master` |
+| 按需 | `playwright-analyze-page`, `add-in-skills-master` |
 
 <!-- MANUAL_END -->
 

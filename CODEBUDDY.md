@@ -213,7 +213,6 @@ The three core modules work together:
 ### Development Workflow
 - **skill-creator**: Create new skills with standard structure
 - **add-in-skills-master**: Contribute skills to master library
-- **spec-kit-workflow**: Implement Spec-Driven Development (Specify → Plan → Tasks → Implement)
 - **update-skills-master**: Pull latest skills from GitHub using sparse checkout
 
 ### Code Quality

@@ -110,7 +110,6 @@ Subagents-Master 使你能够创建和管理专业化的 AI 子智能体，处�
 | **skill-creator** | 一个工具，用于轻松创建具有标准目录结构的新技能。 |
 | **add-in-skills-master** | Adds or updates skill templates in the skills-master library. Invoke when user wants to contribute a new skill to the master library. |
 | **context-aware-coding** | 管理 `AI_README.md` 并强制执行架构上下文。 |
-| **spec-kit-workflow** | 将 [Spec-Kit](https://github.com/Start-With-Spec/Spec-Kit) 方法论（明确需求 -> 计划 -> 任务 -> 实现）集成到你的工作流中的技能。它包含用于规范驱动开发的模板和指南。 |
 | **git-diff-requirement** | Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation. |
 | **subagent-creator** | 专门用于生成子智能体的 skill，通过交互式问答收集信息并生成标准化的子智能体配置文档 |
 | **code-review** | Code review skill. Triggered when user says 'I have completed this requirement, please review my code'. Analyzes git diff HEAD changes, checks business correctness against requirement documents, identifies logic defects or implementation errors, and provides detailed review feedback and suggestions. |

@@ -111,7 +111,6 @@ These three modules work together to create a powerful AI development ecosystem:
 | **skill-creator** | A tool to easily create new skills with standard directory structures. |
 | **add-in-skills-master** | Adds or updates skill templates in the skills-master library. Invoke when user wants to contribute a new skill to the master library. |
 | **context-aware-coding** | Manages `AI_README.md` and enforces architectural context. |
-| **spec-kit-workflow** | A skill that integrates [Spec-Kit](https://github.com/Start-With-Spec/Spec-Kit) methodology (Specify -> Plan -> Tasks -> Implement) into your workflow. It includes templates and guides for Spec-Driven Development. |
 | **git-diff-requirement** | Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation. |
 | **subagent-creator** | 专门用于生成子智能体的 skill，通过交互式问答收集信息并生成标准化的子智能体配置文档 |
 | **code-review** | Code review skill. Triggered when user says 'I have completed this requirement, please review my code'. Analyzes git diff HEAD changes, checks business correctness against requirement documents, identifies logic defects or implementation errors, and provides detailed review feedback and suggestions. |

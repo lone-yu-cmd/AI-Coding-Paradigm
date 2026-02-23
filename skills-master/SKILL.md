@@ -17,7 +17,6 @@ The following skill templates are available in `assets/skill-templates/`:
 *   **context-aware-coding**: Manages `AI_README.md` and enforces Context-First Architecture.
 *   **project-analyzer**: Bootstraps documentation for new/legacy projects.
 *   **skill-creator**: Creates new skills and maintains the index.
-*   **spec-kit-workflow**: Implements Spec-Driven Development (Specify -> Plan -> Tasks -> Implement).
 *   **git-diff-requirement**: Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation.
 *   **subagent-creator**: 专门用于生成子智能体的 skill，通过交互式问答收集信息并生成标准化的子智能体配置文档
 *   **code-review**: Code review skill. Triggered when user says 'I have completed this requirement, please review my code'. Analyzes git diff HEAD changes, checks business correctness against requirement documents, identifies logic defects or implementation errors, and provides detailed review feedback and suggestions.
