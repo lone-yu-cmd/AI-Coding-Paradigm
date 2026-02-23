@@ -124,14 +124,30 @@ These three modules work together to create a powerful AI development ecosystem:
 
 ## 🛠️ Installation
 
-### Prerequisites
+### Quick Install via npx (Recommended)
+
+Install skills to your AI coding agent in one command using [npx skills](https://github.com/vercel-labs/skills):
+
+```bash
+# Install all skills
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm
+
+# Install a specific skill
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm --skill skills-master
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm --skill playwright-pro
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm --skill auto-committer
+```
+
+> Supports 40+ agents including **Cursor**, **Claude Code**, **CodeBuddy**, **Trae**, **Windsurf**, **GitHub Copilot**, **Gemini CLI**, and more.
+
+### Manual Installation
+
+#### Prerequisites
 
 *   Python 3.6+
 *   Git
 
-### Quick Start
-
-**Clone the repository** to get all three core modules:
+#### Clone the Repository
 
 ```bash
 git clone https://github.com/lone-yu-cmd/ai-coding-paradigm.git

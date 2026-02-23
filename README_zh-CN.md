@@ -123,14 +123,30 @@ Subagents-Master 使你能够创建和管理专业化的 AI 子智能体，处�
 
 ## 🛠️ 安装
 
-### 先决条件
+### 通过 npx 快速安装（推荐）
+
+使用 [npx skills](https://github.com/vercel-labs/skills) 一行命令将技能安装到你的 AI 编程助手中：
+
+```bash
+# 安装所有技能
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm
+
+# 安装指定技能
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm --skill skills-master
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm --skill playwright-pro
+npx skills add https://github.com/lone-yu-cmd/AI-Coding-Paradigm --skill auto-committer
+```
+
+> 支持 40+ AI 编程助手，包括 **Cursor**、**Claude Code**、**CodeBuddy**、**Trae**、**Windsurf**、**GitHub Copilot**、**Gemini CLI** 等。
+
+### 手动安装
+
+#### 先决条件
 
 *   Python 3.6+
 *   Git
 
-### 快速开始
-
-**克隆仓库**以获取所有三个核心模块：
+#### 克隆仓库
 
 ```bash
 git clone https://github.com/lone-yu-cmd/ai-coding-paradigm.git
