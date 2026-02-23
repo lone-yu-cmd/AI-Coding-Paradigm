@@ -46,7 +46,7 @@ skills-master/
         ├── context-ai-sync/          # AI 上下文文档系统
         ├── auto-committer/           # 自动化 Git 提交
         ├── context-code-explainer/           # 代码分析报告生成
-        ├── code-review/              # 代码审查
+        ├── git-diff-requirement/     # 需求匹配分析
         ├── context-aware-coding/     # 上下文感知编码
         ├── git-diff-requirement/     # Git Diff 需求分析
         ├── playwright-analyze-page/  # 页面结构分析
@@ -183,7 +183,7 @@ python3 skills/skills-master/scripts/install.py --all
 #### 🛠️ 开发工具类
 - **auto-committer**: 自动化 Git 提交，生成规范的提交信息
 - **context-code-explainer**: 生成结构化的代码分析报告
-- **code-review**: 代码审查，检查业务正确性和逻辑缺陷
+- **git-diff-requirement**: 分析代码变更与需求匹配度，检测缺陷
 - **git-diff-requirement**: 分析代码变更是否符合需求
 
 #### 📝 文档管理类
@@ -204,7 +204,7 @@ python3 skills/skills-master/scripts/install.py --all
 
 | 频率 | 技能列表 |
 |-----|---------|
-| 高频 | `auto-committer`, `code-review`, `context-ai-sync` |
+| 高频 | `auto-committer`, `git-diff-requirement`, `context-ai-sync` |
 | 中频 | `requirements-analysis`, `git-diff-requirement`, `context-code-explainer` |
 | 低频 | `context-project-analyzer`, `skill-creator`, `subagent-creator` |
 | 按需 | `playwright-analyze-page`, `add-in-skills-master` |

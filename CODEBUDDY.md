@@ -216,7 +216,7 @@ The three core modules work together:
 - **update-skills-master**: Pull latest skills from GitHub using sparse checkout
 
 ### Code Quality
-- **code-review**: Analyze git diff HEAD against requirements
+- **git-diff-requirement**: Detect defects in code changes
 - **git-diff-requirement**: Detect defects in code changes
 - **context-code-explainer**: Generate structured code analysis reports
 
