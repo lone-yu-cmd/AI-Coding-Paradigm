@@ -225,7 +225,7 @@ The three core modules work together:
 - **context-requirements-analysis**: Context-aware requirements analysis with AI_CONTEXT documentation
 
 ### Specialized Analysis
-- **playwright-analyze-page**: Connect to Chrome DevTools, analyze page DOM, interactions, and CSS
+- **playwright-pro**: Enhanced Playwright page analyzer - connects to local Chrome via CDP, preserving login state and extensions
 - **context-ai-sync**: Intelligent AI context documentation system
 
 ### Subagent Creation

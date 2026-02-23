@@ -21,7 +21,7 @@ The following skill templates are available in `assets/skill-templates/`:
 *   **subagent-creator**: 专门用于生成子智能体的 skill，通过交互式问答收集信息并生成标准化的子智能体配置文档
 *   **git-diff-requirement**: Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation.
 
-*   **playwright-analyze-page**: 连接调试版Chrome浏览器，分析当前页面的DOM结构、交互元素和CSS样式信息。同时直接解析加载的插件内容。
+*   **playwright-pro**: 增强版 Playwright 页面分析工具：通过 CDP 连接本地已运行的 Chrome/Edge/Brave，无需新开窗口，保留登录态和扩展，一键分析页面 DOM、样式、网络请求、Console 日志和性能指标。
 *   **context-ai-sync**: Intelligent AI context documentation system for projects. Invoke with 'AI Context Sync' to initialize project docs or sync with code changes.
 *   **context-requirements-analysis**: Context-aware requirements analysis skill. Automatically triggered when users request to complete specific requirements by reading existing AI documents or AI_CONTEXT documentation. The skill intelligently identifies scenario types and reads relevant documentation.
 *   **update-skills-master**: Pull latest skills-master from GitHub using sparse checkout. Auto-detects target directory and works universally across different project structures.

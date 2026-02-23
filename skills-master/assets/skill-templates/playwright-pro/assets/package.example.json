@@ -1,5 +1,5 @@
 {
-  "name": "playwright-analyze-page-scripts",
+  "name": "playwright-pro-scripts",
   "version": "1.0.0",
   "description": "Playwright CDP 连接脚本 - 用于分析 Chrome 页面的 DOM 和样式",
   "type": "module",

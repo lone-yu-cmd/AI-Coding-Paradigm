@@ -49,7 +49,7 @@ skills-master/
         ├── git-diff-requirement/     # 需求匹配分析
         ├── context-aware-coding/     # 上下文感知编码
         ├── git-diff-requirement/     # Git Diff 需求分析
-        ├── playwright-analyze-page/  # 页面结构分析
+        ├── playwright-pro/           # 增强版页面分析（CDP 连接本地 Chrome）
         ├── context-project-analyzer/         # 项目分析器
 
         ├── skill-creator/            # 技能创建器
@@ -197,7 +197,7 @@ python3 skills/skills-master/scripts/install.py --all
 - **subagent-creator**: 生成子智能体配置文档
 
 #### 🔧 工具集成类
-- **playwright-analyze-page**: 连接 Chrome 浏览器分析页面结构
+- **playwright-pro**: 增强版 Playwright 页面分析，通过 CDP 连接本地 Chrome
 - **add-in-skills-master**: 添加/更新技能模板到库
 
 ### 技能使用频率
@@ -207,7 +207,7 @@ python3 skills/skills-master/scripts/install.py --all
 | 高频 | `auto-committer`, `git-diff-requirement`, `context-ai-sync` |
 | 中频 | `git-diff-requirement`, `context-code-explainer`, `context-requirements-analysis` |
 | 低频 | `context-project-analyzer`, `skill-creator`, `subagent-creator` |
-| 按需 | `playwright-analyze-page`, `add-in-skills-master` |
+| 按需 | `playwright-pro`, `add-in-skills-master` |
 
 <!-- MANUAL_END -->
 
