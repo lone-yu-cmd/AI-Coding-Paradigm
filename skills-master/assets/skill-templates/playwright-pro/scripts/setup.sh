@@ -322,8 +322,8 @@ update_package_scripts() {
         jq --arg cdp "$cdp_script" \
             '.scripts["debug:connect"] = ("node " + $cdp) |
             .scripts["debug:styles"] = ("node " + $cdp + " 0") |
-            .scripts["debug:launch-chrome"] = "./scripts/debug/launch-chrome.sh" |
-            .scripts["debug:launch-default"] = "./scripts/debug/launch-chrome.sh --use-default-profile" |
+            .scripts["debug:launch-chrome"] = "./scripts/debug/launch-chrome.sh --yes" |
+            .scripts["debug:launch-isolated"] = "./scripts/debug/launch-chrome.sh --yes --isolated-profile" |
             .scripts["debug:fast"] = ("node " + $cdp + " --no-network --no-perf")' \
             package.json > "$tmp_file"
         mv "$tmp_file" package.json
@@ -334,8 +334,8 @@ update_package_scripts() {
         echo -e "${BLUE}   \"scripts\": {"
         echo "     \"debug:connect\": \"node $cdp_script\","
         echo "     \"debug:styles\": \"node $cdp_script 0\","
-        echo '     "debug:launch-chrome": "./scripts/debug/launch-chrome.sh",'
-        echo '     "debug:launch-default": "./scripts/debug/launch-chrome.sh --use-default-profile",'
+        echo '     "debug:launch-chrome": "./scripts/debug/launch-chrome.sh --yes",'
+        echo '     "debug:launch-isolated": "./scripts/debug/launch-chrome.sh --yes --isolated-profile",'
         echo "     \"debug:fast\": \"node $cdp_script --no-network --no-perf\""
         echo -e "   }${NC}"
     fi
@@ -403,9 +403,9 @@ print_usage() {
     
     echo -e "${BLUE}📖 使用方法:${NC}"
     echo ""
-    echo "   1. 启动调试版浏览器:"
+    echo "   1. 启动调试版浏览器（默认保留登录态）:"
     echo -e "      ${YELLOW}$PKG_MANAGER run debug:launch-chrome${NC}"
-    echo -e "      ${YELLOW}$PKG_MANAGER run debug:launch-default${NC}  (复用默认 profile，保留登录态)"
+    echo -e "      ${YELLOW}$PKG_MANAGER run debug:launch-isolated${NC}  (使用独立 profile，无登录态)"
     echo ""
     echo "   2. 在浏览器中打开目标页面"
     echo ""

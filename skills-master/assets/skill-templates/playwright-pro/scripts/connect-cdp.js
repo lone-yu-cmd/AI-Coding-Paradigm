@@ -26,7 +26,7 @@
  *   - style-report.md             - 样式分析报告
  *   - dom-tree.txt                - DOM 结构树
  *   - page-data.json              - 完整数据
- *   - accessibility-snapshot.json - 无障碍快照
+ *   - accessibility-snapshot.txt  - 无障碍快照（ARIA）
  *   - network-requests.json       - 网络请求日志
  *   - console-logs.json           - Console 日志
  *   - performance-metrics.json    - 性能指标
@@ -727,8 +727,7 @@ async function findPageByUrlOrTitle(pages, keyword) {
       if (!match) {
         console.error(`❌ 未找到匹配 "${config.urlKeyword}" 的标签页`);
         console.error(`   请检查 URL 或标题关键字`);
-        await browser.close();
-        return;
+        process.exit(1);
       }
       targetPage = match.page;
       targetIndex = match.index;
@@ -738,8 +737,7 @@ async function findPageByUrlOrTitle(pages, keyword) {
       targetPage = pages[targetIndex];
       if (!targetPage) {
         console.error(`❌ 页面索引 ${targetIndex} 不存在`);
-        await browser.close();
-        return;
+        process.exit(1);
       }
     }
     
@@ -879,12 +877,12 @@ async function findPageByUrlOrTitle(pages, keyword) {
     fs.writeFileSync(jsonPath, JSON.stringify(jsonData, null, 2));
     console.log(`   ✅ JSON 数据: ${jsonPath}`);
     
-    // 无障碍快照
+    // 无障碍快照（使用 ariaSnapshot，兼容 Playwright 1.49+）
     console.log('\n♿ 正在获取无障碍快照...');
     try {
-      const snapshot = await targetPage.accessibility.snapshot();
-      const snapshotPath = path.join(OUTPUT_DIR, 'accessibility-snapshot.json');
-      fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
+      const snapshot = await targetPage.locator(':root').ariaSnapshot();
+      const snapshotPath = path.join(OUTPUT_DIR, 'accessibility-snapshot.txt');
+      fs.writeFileSync(snapshotPath, snapshot);
       console.log(`   ✅ 无障碍快照: ${snapshotPath}`);
     } catch (e) {
       console.log(`   ⚠️ 无障碍快照失败: ${e.message}`);
@@ -922,7 +920,7 @@ async function findPageByUrlOrTitle(pages, keyword) {
       '📄 style-report.md       - 综合分析报告',
       '🌲 dom-tree.txt          - DOM 结构树',
       '📊 page-data.json        - 完整数据 (JSON)',
-      '♿ accessibility-snapshot.json - 无障碍快照',
+      '♿ accessibility-snapshot.txt  - 无障碍快照（ARIA）',
     ];
     
     if (config.captureNetwork && networkRequests.length > 0) {
@@ -943,7 +941,11 @@ async function findPageByUrlOrTitle(pages, keyword) {
     
     console.log(`\n💡 提示: 将 style-report.md 的内容发送给 AI，它就能理解页面的样式和性能了！\n`);
     
-    await browser.close();
+    // IMPORTANT: 使用 process.exit() 而非 browser.close()
+    // browser.close() 在 CDP 连接模式下会销毁浏览器的调试上下文，导致 CDP 端口不再监听
+    // 这意味着用户需要重启浏览器才能再次连接，体验极差
+    // process.exit() 只断开 WebSocket 连接，不影响浏览器的 CDP 端口
+    process.exit(0);
     
   } catch (error) {
     console.error('❌ Failed to connect:', error.message);

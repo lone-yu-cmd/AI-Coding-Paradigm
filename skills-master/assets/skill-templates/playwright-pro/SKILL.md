@@ -79,15 +79,16 @@ curl -s http://localhost:9222/json/version
 **MUST** 使用本技能提供的 `launch-chrome.sh` 脚本启动浏览器，**NEVER** 自行拼接启动命令：
 
 ```bash
-# 方式一：使用独立 profile（默认，不影响现有浏览器数据）
+# 方式一：默认启动（复用用户 profile，保留登录态、书签、扩展、历史记录）
 npm run debug:launch-chrome
 
-# 方式二：复用默认 profile（保留登录态、书签、扩展、历史记录）【推荐需要登录态时使用】
-npm run debug:launch-default
+# 方式二：使用独立调试 profile（不含登录态和浏览器数据）
+npm run debug:launch-isolated
 
-# 方式三：直接调用脚本（效果相同）
+# 方式三：直接调用脚本（默认复用用户 profile）
 ./scripts/debug/launch-chrome.sh
-./scripts/debug/launch-chrome.sh --use-default-profile
+./scripts/debug/launch-chrome.sh --yes                 # 非交互模式（AI/CI 使用）
+./scripts/debug/launch-chrome.sh --isolated-profile    # 独立 profile
 
 # 方式四：使用 Edge 或 Brave
 ./scripts/debug/launch-chrome.sh --browser edge
@@ -101,11 +102,13 @@ npm run debug:launch-default
 - 内置端口就绪等待和重试逻辑（最多等待 15 秒）
 - 跨平台浏览器路径自动检测（macOS/Linux/Windows）
 
-**如果脚本因需要交互确认而阻塞**（如提示"是否关闭 Chrome"），使用以下方式处理：
+**如果脚本因需要交互确认而阻塞**（如提示"是否关闭 Chrome"），使用 `--yes` 参数：
 ```bash
-# 先关闭现有 Chrome，再重新调用脚本
-pkill -9 "Google Chrome" 2>/dev/null; sleep 2
+# npm scripts 已默认带 --yes 参数，不会阻塞
 npm run debug:launch-chrome
+
+# 直接调用脚本时加 --yes
+./scripts/debug/launch-chrome.sh --yes
 ```
 注意：关闭后仍然 **MUST** 使用脚本重新启动，**NEVER** 自行拼接 Chrome 命令。
 
@@ -159,7 +162,7 @@ node scripts/debug/connect-cdp.js --network-wait 10
 | `style-report.md` | 综合分析报告（样式+性能+网络+Console 摘要） |
 | `dom-tree.txt` | DOM 结构树 |
 | `page-data.json` | 完整页面数据（JSON） |
-| `accessibility-snapshot.json` | 无障碍快照 |
+| `accessibility-snapshot.txt` | 无障碍快照（ARIA） |
 | `network-requests.json` | 网络请求日志（含请求/响应/时间线） |
 | `console-logs.json` | Console 日志（error/warn/log/info） |
 | `performance-metrics.json` | 性能指标（Web Vitals + 资源加载 + 内存） |
@@ -172,8 +175,8 @@ node scripts/debug/connect-cdp.js --network-wait 10
 |------|------|------|
 | 0 | `${SKILL_DIR}/scripts/setup.sh` | **首次使用 MUST 执行**：安装脚本到目标项目 |
 | 1 | `curl -s http://localhost:9222/json/version` | 检查 CDP 是否就绪 |
-| 2 | `npm run debug:launch-chrome` | 启动调试版浏览器（独立 profile） |
-| 2 | `npm run debug:launch-default` | 启动调试版浏览器（复用默认 profile，保留登录态） |
+| 2 | `npm run debug:launch-chrome` | 启动调试版浏览器（默认复用用户 profile，保留登录态） |
+| 2 | `npm run debug:launch-isolated` | 启动调试版浏览器（独立 profile，无登录态） |
 | 3 | `npm run debug:connect` | 通过 CDP 完整分析当前页面 |
 | 3 | `npm run debug:fast` | 通过 CDP 快速分析（跳过网络和性能） |
 | 3 | `npm run debug:styles` | 通过 CDP 仅分析样式 |
@@ -186,9 +189,12 @@ node scripts/debug/connect-cdp.js --network-wait 10
 
 | 参数 | 说明 |
 |------|------|
-| `--use-default-profile` | 复用用户默认 profile（保留登录态、书签等） |
+| `--isolated-profile` | 使用独立调试 profile（不含登录态和浏览器数据） |
+| `--yes`, `-y` | 非交互模式，自动确认所有提示（AI/CI 调用推荐） |
 | `--browser <name>` | 指定浏览器：`chrome`（默认）、`edge`、`brave` |
 | `--port <number>` | 调试端口（默认：9222） |
+
+> **注意**：默认复用用户的浏览器 profile（保留登录态），无需额外参数。
 
 ### connect-cdp.js
 
@@ -223,7 +229,8 @@ node scripts/debug/connect-cdp.js --network-wait 10
 | 端口始终不监听 | 手动拼接 Chrome 命令导致 singleton lock | 关闭所有 Chrome 后使用 `launch-chrome.sh` 脚本重新启动 |
 | 端口被占用 | 已有浏览器实例占用端口 | 脚本会自动检测已有调试端口并复用 |
 | 浏览器未找到 | 非标准安装路径 | 设置 `CHROME_PATH` 或使用 `--browser` 参数 |
-| 需要保留登录态 | 使用了独立 profile | 使用 `--use-default-profile` 复用默认 profile |
+| 需要保留登录态 | 默认行为 | 默认已复用用户 profile，无需额外参数 |
+| 不需要登录态 | 想用干净浏览器 | 使用 `--isolated-profile` 参数 |
 | 标签页太多找不到 | 索引方式不方便 | 使用 `--url <关键字>` 按 URL 匹配 |
 | 分析太慢 | 网络请求捕获需刷新页面 | 使用 `debug:fast` 或 `--no-network` |
 

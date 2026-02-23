@@ -10,9 +10,11 @@
 #   ./launch-chrome.sh [选项]
 #   
 # 选项：
-#   --use-default-profile   复用用户默认的浏览器 profile（保留登录态、书签等）
+#   --isolated-profile      使用独立调试 profile（不含登录态）
+#   --profile <name>        指定 profile 目录名（如 "Default", "Profile 1"）
 #   --browser <name>        指定浏览器：chrome（默认）、edge、brave
 #   --port <number>         调试端口（默认：9222）
+#   --yes, -y              非交互模式，自动确认所有提示
 #   --help                  显示帮助信息
 #
 # 环境变量：
@@ -24,7 +26,9 @@
 # 默认配置
 DEBUG_PORT=${DEBUG_PORT:-9222}
 BROWSER_TYPE=${BROWSER_TYPE:-chrome}
-USE_DEFAULT_PROFILE=false
+USE_DEFAULT_PROFILE=true
+AUTO_YES=false
+PROFILE_NAME=""  # 用户指定的 profile 目录名（如 "Default", "Profile 1"）
 
 # =============================================================================
 # 参数解析
@@ -36,10 +40,17 @@ show_help() {
     echo "用法: ./launch-chrome.sh [选项]"
     echo ""
     echo "选项:"
-    echo "  --use-default-profile   复用用户默认 profile（保留登录态、书签、历史记录）"
+    echo "  --isolated-profile      使用独立调试 profile（不含登录态和浏览器数据）"
+    echo "  --profile <name>        指定 profile 目录名（如 'Default', 'Profile 1'）"
     echo "  --browser <name>        指定浏览器: chrome (默认), edge, brave"
     echo "  --port <number>         调试端口（默认: 9222）"
+    echo "  --yes, -y               非交互模式，自动确认所有提示（适合 AI/CI 调用）"
     echo "  --help                  显示此帮助信息"
+    echo ""
+    echo "默认行为："
+    echo "  默认复用用户的浏览器 profile（保留登录态、书签、扩展、历史记录）"
+    echo "  自动检测最近使用的 profile，或通过 --profile 指定"
+    echo "  使用 --isolated-profile 可切换为独立调试 profile"
     echo ""
     echo "环境变量:"
     echo "  DEBUG_PORT    调试端口（默认: 9222）"
@@ -47,16 +58,30 @@ show_help() {
     echo "  BROWSER_TYPE  浏览器类型: chrome/edge/brave（默认: chrome）"
     echo ""
     echo "示例:"
-    echo "  ./launch-chrome.sh                                # 使用独立 profile 启动 Chrome"
-    echo "  ./launch-chrome.sh --use-default-profile          # 复用默认 profile"
+    echo "  ./launch-chrome.sh                                # 复用默认 profile（保留登录态）"
+    echo "  ./launch-chrome.sh --profile 'Profile 1'          # 指定特定 profile"
+    echo "  ./launch-chrome.sh --isolated-profile             # 使用独立调试 profile"
+    echo "  ./launch-chrome.sh --yes                          # 非交互模式，自动确认"
     echo "  ./launch-chrome.sh --browser edge                 # 使用 Edge"
-    echo "  ./launch-chrome.sh --browser brave --port 9333    # Brave + 自定义端口"
 }
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         --use-default-profile)
+            # 向后兼容：默认已经是 true，保留此参数不报错
             USE_DEFAULT_PROFILE=true
+            shift
+            ;;
+        --isolated-profile)
+            USE_DEFAULT_PROFILE=false
+            shift
+            ;;
+        --profile)
+            PROFILE_NAME="$2"
+            shift 2
+            ;;
+        --yes|-y)
+            AUTO_YES=true
             shift
             ;;
         --browser)
@@ -276,9 +301,102 @@ echo "   端口: $DEBUG_PORT"
 if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
     echo "   配置: 默认 profile（保留登录态和数据）"
 else
-    echo "   配置: 独立调试 profile"
+    echo "   配置: 独立调试 profile（无登录态）"
+fi
+if [[ "$AUTO_YES" == true ]]; then
+    echo "   模式: 非交互（自动确认）"
 fi
 echo ""
+
+# 检查浏览器主进程是否在运行（排除 crashpad_handler 等辅助进程）
+is_browser_running() {
+    local pattern="$1"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS: 使用 pgrep 精确匹配进程名（不匹配命令行参数）
+        pgrep -x "$pattern" > /dev/null 2>&1
+    else
+        # Linux/Windows: 使用 pgrep -f 但排除辅助进程
+        pgrep -f "$pattern" 2>/dev/null | while read pid; do
+            local cmd=$(ps -o comm= -p "$pid" 2>/dev/null)
+            if [[ "$cmd" != *"crashpad"* ]] && [[ "$cmd" != *"helper"* ]]; then
+                return 0
+            fi
+        done
+        return 1
+    fi
+}
+
+# 终止浏览器所有进程（包括辅助进程）
+kill_browser() {
+    local pattern="$1"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS: killall 更可靠（按进程名匹配）
+        killall -9 "$pattern" 2>/dev/null
+        # 也清理可能残留的 crashpad_handler
+        pkill -9 -f "crashpad_handler.*$pattern" 2>/dev/null
+    else
+        pkill -9 -f "$pattern" 2>/dev/null
+    fi
+}
+
+# 自动检测最近使用的 profile 目录名
+# Chrome 的 user-data-dir 下有 Default、Profile 1、Profile 2 等子目录
+# 通过检查 Preferences 文件的修改时间来判断哪个是最近使用的
+detect_recent_profile() {
+    local user_data_dir="$1"
+    local latest_profile=""
+    local latest_time=0
+    
+    # 遍历所有 profile 目录
+    for profile_dir in "$user_data_dir"/Default "$user_data_dir"/Profile\ *; do
+        if [[ -d "$profile_dir" ]]; then
+            local pref_file="$profile_dir/Preferences"
+            if [[ -f "$pref_file" ]]; then
+                local mod_time
+                if [[ "$OSTYPE" == "darwin"* ]]; then
+                    mod_time=$(stat -f %m "$pref_file" 2>/dev/null || echo 0)
+                else
+                    mod_time=$(stat -c %Y "$pref_file" 2>/dev/null || echo 0)
+                fi
+                if [[ "$mod_time" -gt "$latest_time" ]]; then
+                    latest_time=$mod_time
+                    latest_profile=$(basename "$profile_dir")
+                fi
+            fi
+        fi
+    done
+    
+    # 如果没有找到任何 profile，默认使用 "Default"
+    if [[ -z "$latest_profile" ]]; then
+        latest_profile="Default"
+    fi
+    
+    echo "$latest_profile"
+}
+
+# 列出所有可用的 profile
+list_profiles() {
+    local user_data_dir="$1"
+    local count=0
+    
+    for profile_dir in "$user_data_dir"/Default "$user_data_dir"/Profile\ *; do
+        if [[ -d "$profile_dir" ]]; then
+            local dirname=$(basename "$profile_dir")
+            local name=""
+            local pref_file="$profile_dir/Preferences"
+            if [[ -f "$pref_file" ]]; then
+                # 尝试从 Preferences 中提取 profile 名称
+                name=$(grep -o '"name":"[^"]*"' "$pref_file" 2>/dev/null | head -1 | cut -d'"' -f4)
+            fi
+            if [[ -n "$name" ]]; then
+                echo "      [$count] $dirname → $name"
+            else
+                echo "      [$count] $dirname"
+            fi
+            ((count++))
+        fi
+    done
+}
 
 # Step 1: 检查是否已有调试端口可用
 if try_connect_existing; then
@@ -286,7 +404,7 @@ if try_connect_existing; then
 fi
 
 # Step 2: 检查浏览器是否在运行（但没有调试端口）
-if pgrep -f "$BROWSER_PROCESS" > /dev/null 2>&1; then
+if is_browser_running "$BROWSER_PROCESS"; then
     echo "⚠️  $BROWSER_DISPLAY_NAME 正在运行，但未开启调试端口"
     echo ""
     
@@ -298,20 +416,30 @@ if pgrep -f "$BROWSER_PROCESS" > /dev/null 2>&1; then
         echo "⚡ 提示: 使用独立 profile 模式"
         echo "   将启动一个新的浏览器窗口，不影响当前运行的实例"
         echo "   但需要先关闭当前浏览器才能使用调试端口"
-        echo ""
-        echo "   💡 或者使用 --use-default-profile 选项复用当前登录态"
     fi
     
     echo ""
-    read -p "❓ 是否要关闭 $BROWSER_DISPLAY_NAME 并以调试模式重启? (y/n) " -n 1 -r
-    echo
+    
+    if [[ "$AUTO_YES" == true ]]; then
+        echo "🤖 非交互模式：自动确认关闭 $BROWSER_DISPLAY_NAME"
+        REPLY="y"
+    else
+        read -p "❓ 是否要关闭 $BROWSER_DISPLAY_NAME 并以调试模式重启? (y/n) " -n 1 -r
+        echo
+    fi
     
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "🛑 正在关闭 $BROWSER_DISPLAY_NAME 进程..."
-        pkill -9 "$BROWSER_PROCESS" 2>/dev/null
+        kill_browser "$BROWSER_PROCESS"
         sleep 2
         
-        if pgrep -f "$BROWSER_PROCESS" > /dev/null 2>&1; then
+        if is_browser_running "$BROWSER_PROCESS"; then
+            # 再试一次
+            kill_browser "$BROWSER_PROCESS"
+            sleep 2
+        fi
+        
+        if is_browser_running "$BROWSER_PROCESS"; then
             echo "❌ 无法关闭所有进程"
             echo "   请手动运行: killall -9 '$BROWSER_PROCESS'"
             exit 1
@@ -327,25 +455,56 @@ echo ""
 echo "🚀 正在以调试模式启动 $BROWSER_DISPLAY_NAME..."
 
 # Step 3: 确定 profile 目录
+LAUNCH_ARGS=("--remote-debugging-port=$DEBUG_PORT")
+
 if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
     PROFILE_DIR=$(get_default_profile_dir "$BROWSER_TYPE")
-    echo "📁 使用默认 profile: $PROFILE_DIR"
+    echo "📁 使用用户数据目录: $PROFILE_DIR"
+    
+    # 确定 --profile-directory 参数
+    if [[ -n "$PROFILE_NAME" ]]; then
+        # 用户显式指定了 profile
+        if [[ ! -d "$PROFILE_DIR/$PROFILE_NAME" ]]; then
+            echo "❌ 指定的 profile 不存在: $PROFILE_DIR/$PROFILE_NAME"
+            echo ""
+            echo "   可用的 profile:"
+            list_profiles "$PROFILE_DIR"
+            exit 1
+        fi
+        SELECTED_PROFILE="$PROFILE_NAME"
+    else
+        # 自动检测最近使用的 profile
+        SELECTED_PROFILE=$(detect_recent_profile "$PROFILE_DIR")
+    fi
+    
+    echo "👤 使用 profile: $SELECTED_PROFILE"
+    
+    # 显示 profile 中的用户名（如果能提取到）
+    PREF_FILE="$PROFILE_DIR/$SELECTED_PROFILE/Preferences"
+    if [[ -f "$PREF_FILE" ]]; then
+        PROFILE_USER_NAME=$(grep -o '"name":"[^"]*"' "$PREF_FILE" 2>/dev/null | head -1 | cut -d'"' -f4)
+        if [[ -n "$PROFILE_USER_NAME" ]]; then
+            echo "   用户: $PROFILE_USER_NAME"
+        fi
+    fi
+    
     echo ""
     echo "⚠️  注意: 使用默认 profile 时，调试工具可以访问您的所有浏览器数据"
     echo "   请确保在受信任的环境中使用"
+    
+    LAUNCH_ARGS+=("--user-data-dir=$PROFILE_DIR")
+    LAUNCH_ARGS+=("--profile-directory=$SELECTED_PROFILE")
 else
     PROFILE_DIR="$HOME/.playwright-pro-debug-profile-$BROWSER_TYPE"
     mkdir -p "$PROFILE_DIR"
     echo "📁 使用独立 profile: $PROFILE_DIR"
+    LAUNCH_ARGS+=("--user-data-dir=$PROFILE_DIR")
 fi
 
 echo ""
 
 # Step 4: 启动浏览器
-"$BROWSER_PATH" \
-    --remote-debugging-port=$DEBUG_PORT \
-    --user-data-dir="$PROFILE_DIR" \
-    &
+"$BROWSER_PATH" "${LAUNCH_ARGS[@]}" &
 
 # Step 5: 等待启动
 echo "⏳ 等待调试端口就绪..."
