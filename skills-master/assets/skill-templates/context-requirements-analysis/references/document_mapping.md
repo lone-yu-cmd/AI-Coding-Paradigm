@@ -10,7 +10,7 @@
 
 工作流程：
 1. 📖 **读取** AI_CONTEXT 文档（了解上下文）
-2. 📝 **创建** 需求分析文档（调用 requirements-analysis 工作流）
+2. 📝 **创建** 需求分析文档
 3. ✅ **确认** 等待用户确认
 4. 🔨 **实施** 按计划执行代码变更
 5. 📚 **更新** AI_CONTEXT 文档（保持同步）
@@ -111,7 +111,7 @@
 
 #### Step 2: 创建需求分析文档
 
-使用 `requirements-analysis` 技能的工作流：
+使用标准需求分析工作流：
 
 1. 创建 `.requirementsAnalysis` 文件夹
 2. 更新 `.gitignore`
@@ -409,13 +409,13 @@ interface NewDataType {
 - 需求文档**引用** AI_CONTEXT 文档来了解上下文
 - 完成后**更新** AI_CONTEXT 文档来保持同步
 
-### Q4: 如何与 requirements-analysis 技能配合？
+### Q4: 工作流程是怎样的？
 
-**A**: `ai_context_requirements-analysis` **扩展**了 `requirements-analysis`：
-1. 先读取 AI_CONTEXT 文档（额外步骤）
-2. 使用 requirements-analysis 的工作流创建需求文档
+**A**: 本技能采用完整的需求分析流程：
+1. 先读取 AI_CONTEXT 文档（理解上下文）
+2. 创建需求文档（标准工作流）
 3. 需求文档内容增强（包含 AI_CONTEXT 洞察）
-4. 完成后更新 AI_CONTEXT 文档（额外步骤）
+4. 完成后更新 AI_CONTEXT 文档（保持同步）
 
 ---
 

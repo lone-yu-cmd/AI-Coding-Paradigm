@@ -51,7 +51,7 @@ skills-master/
         ├── git-diff-requirement/     # Git Diff 需求分析
         ├── playwright-analyze-page/  # 页面结构分析
         ├── context-project-analyzer/         # 项目分析器
-        ├── requirements-analysis/    # 需求分析文档创建
+
         ├── skill-creator/            # 技能创建器
         └── subagent-creator/         # 子智能体创建器
 ```
@@ -190,7 +190,7 @@ python3 skills/skills-master/scripts/install.py --all
 - **context-ai-sync**: AI 上下文文档系统，自动同步项目文档
 - **context-aware-coding**: 管理 `AI_README.md`，实施上下文优先架构
 - **context-project-analyzer**: 为新/遗留项目生成引导文档
-- **requirements-analysis**: 创建需求分析文档
+
 
 #### 🏗️ 架构设计类
 - **skill-creator**: 创建新技能并维护索引
@@ -205,7 +205,7 @@ python3 skills/skills-master/scripts/install.py --all
 | 频率 | 技能列表 |
 |-----|---------|
 | 高频 | `auto-committer`, `git-diff-requirement`, `context-ai-sync` |
-| 中频 | `requirements-analysis`, `git-diff-requirement`, `context-code-explainer` |
+| 中频 | `git-diff-requirement`, `context-code-explainer`, `context-requirements-analysis` |
 | 低频 | `context-project-analyzer`, `skill-creator`, `subagent-creator` |
 | 按需 | `playwright-analyze-page`, `add-in-skills-master` |
 

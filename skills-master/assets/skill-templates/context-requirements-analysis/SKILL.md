@@ -10,7 +10,7 @@ description: Context-aware requirements analysis skill. Automatically triggered 
 This skill is a **planning-focused** skill that combines AI_CONTEXT documentation reading with requirements analysis. It does NOT directly implement code changes, but instead:
 
 1. **Reads AI_CONTEXT documents** to understand project context
-2. **Creates a requirements analysis plan** (using `requirements-analysis` skill workflow)
+2. **Creates a requirements analysis plan** (using standard requirements workflow)
 3. **Prepares documentation update plan** for post-implementation
 
 After planning is complete and confirmed by user, the actual implementation begins.
@@ -45,7 +45,7 @@ Invoke this skill when the user expresses ANY of the following:
 ```
 User Request
      │
-     ├─ New AI session?  → [Scenario 1: New AI Session] → No requirements-analysis needed
+     ├─ New AI session?  → [Scenario 1: New AI Session] → No detailed requirements analysis needed
      │
      └─ Development task? → [Step 1: Read AI_CONTEXT Documents]
                                     │
@@ -59,7 +59,7 @@ User Request
                            └────────┴────────┘
                                     │
                                     ↓
-                           [Step 3: Call requirements-analysis Skill]
+                           [Step 3: Create Requirements Analysis Document]
                                     │
                                     ↓
                            [Step 4: User Confirmation]
@@ -146,7 +146,7 @@ Based on the identified scenario type, read the appropriate AI_CONTEXT documents
 
 ### Step 2: Create Requirements Analysis Document
 
-**IMPORTANT**: This step follows the `requirements-analysis` skill workflow.
+**IMPORTANT**: This step follows the standard requirements analysis workflow.
 
 #### 2.1 Check/Create `.requirementsAnalysis` Folder
 
@@ -439,9 +439,9 @@ After all updates are complete, report to user:
 
 ---
 
-## Integration with requirements-analysis Skill
+## Requirements Analysis Workflow
 
-This skill **extends** the `requirements-analysis` skill by:
+This skill follows a structured workflow:
 
 1. **Adding AI_CONTEXT Reading Phase**: Read project documentation before creating requirements
 2. **Enriching Requirements Document**: Include AI_CONTEXT insights in the requirements document
@@ -449,7 +449,7 @@ This skill **extends** the `requirements-analysis` skill by:
 
 ### Workflow Comparison
 
-| Step | requirements-analysis | ai_context_requirements-analysis |
+| Step | Basic Analysis | Context-Aware Analysis |
 |------|----------------------|----------------------------------|
 | 1 | Create .requirementsAnalysis folder | **Read AI_CONTEXT documents** |
 | 2 | Update .gitignore | Create .requirementsAnalysis folder |
@@ -510,12 +510,12 @@ Use `read_file` on this reference when unsure about:
 This skill provides **intelligent, context-aware requirements planning** by:
 
 1. **Reading AI_CONTEXT Documents** → Understand project context before planning
-2. **Creating Enriched Requirements Document** → Using `requirements-analysis` workflow with AI_CONTEXT insights
+2. **Creating Enriched Requirements Document** → Using standard workflow with AI_CONTEXT insights
 3. **Getting User Confirmation** → Ensure plan is correct before implementation
 4. **Executing Implementation** → Track progress in requirements document
 5. **Updating AI_CONTEXT Documents** → Maintain documentation synchronization
 
-**Key Difference from `requirements-analysis`**:
+**Key Difference from basic analysis**:
 - This skill is **context-aware** - it reads AI_CONTEXT documents first
 - Requirements documents include **AI_CONTEXT insights**
 - Includes **documentation update phase** after implementation

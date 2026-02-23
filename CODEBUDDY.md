@@ -221,7 +221,7 @@ The three core modules work together:
 - **context-code-explainer**: Generate structured code analysis reports
 
 ### Requirements Management
-- **requirements-analysis**: Create structured requirement documents in `.requirementsAnalysis/`
+
 - **context-requirements-analysis**: Context-aware requirements analysis with AI_CONTEXT documentation
 
 ### Specialized Analysis

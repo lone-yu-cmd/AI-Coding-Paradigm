@@ -113,7 +113,6 @@ Subagents-Master 使你能够创建和管理专业化的 AI 子智能体，处�
 | **git-diff-requirement** | Analyzes git diff HEAD to evaluate code changes against business requirements, detects defects, and generates structured analysis reports. Invoke when reviewing code changes or validating requirement implementation. |
 | **subagent-creator** | 专门用于生成子智能体的 skill，通过交互式问答收集信息并生成标准化的子智能体配置文档 |
 | **git-diff-requirement** | 分析 git diff HEAD 评估代码变更与业务需求的匹配度，检测缺陷并生成结构化分析报告。 |
-| **requirements-analysis** | 需求分析文档创建技能。当用户告知"需要开始一个新需求"时触发。该技能会创建 .requirementsAnalysis 文件夹、更新 .gitignore、按序号命名创建需求目录，并生成包含需求背景、需求内容、代码实施计划的需求文档。完成后与用户确认内容，确认后开始代码实施。 |
 | **playwright-analyze-page** | 连接调试版Chrome浏览器，分析当前页面的DOM结构、交互元素和CSS样式信息 |
 | **context-ai-sync** | 智能 AI 上下文文档系统。使用 'AI Context Sync' 初始化项目文档或同步代码变更。 |
 | **context-requirements-analysis** | 上下文感知需求分析技能。自动读取 AI 文档或 AI_CONTEXT 文档完成需求分析。 |

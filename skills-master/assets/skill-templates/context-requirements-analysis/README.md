@@ -5,18 +5,18 @@
 这是一个**规划导向**的技能，结合了 AI_CONTEXT 文档阅读与需求分析。它**不直接实施代码变更**，而是：
 
 1. **阅读 AI_CONTEXT 文档**了解项目上下文
-2. **创建需求分析文档**（使用 `requirements-analysis` 技能的工作流）
+2. **创建需求分析文档**（使用标准需求分析工作流）
 3. **规划文档更新**以便实施后保持同步
 
 规划完成并经用户确认后，才开始实际实施。
 
 ---
 
-## 与 requirements-analysis 技能的关系
+## 工作流程
 
-本技能**扩展**了 `requirements-analysis` 技能：
+本技能采用完整的需求分析流程：
 
-| 特性 | requirements-analysis | ai_context_requirements-analysis |
+| 特性 | 基础分析 | 上下文感知分析 |
 |-----|----------------------|----------------------------------|
 | **定位** | 基础需求分析 | 上下文感知的智能需求分析 |
 | **文档阅读** | ❌ 不读取项目文档 | ✅ 读取 AI_CONTEXT 文档 |
@@ -27,10 +27,10 @@
 ### 工作流对比
 
 ```
-requirements-analysis:
+基础分析:
   创建文件夹 → 更新 gitignore → 创建目录 → 创建文档 → 用户确认 → 实施
 
-ai_context_requirements-analysis:
+上下文感知分析:
   读取 AI 文档 → 创建文件夹 → 更新 gitignore → 创建目录 → 创建增强文档 → 用户确认 → 实施 → 更新 AI 文档 → 完成报告
 ```
 
@@ -49,7 +49,7 @@ ai_context_requirements-analysis:
                    [Step 2] 识别场景类型（功能/Bug/重构）
                         │
                         ↓
-                   [Step 3] 创建需求分析文档（调用 requirements-analysis 工作流）
+                   [Step 3] 创建需求分析文档
                         │
                         ↓
                    [Step 4] 用户确认
@@ -315,7 +315,7 @@ ai_context_requirements-analysis/
 - **版本**: 1.1.0
 - **创建日期**: 2026-02-05
 - **更新日期**: 2026-02-05
-- **基于**: requirements-analysis skill + AI Context Sync
+- **基于**: AI Context Sync + 标准需求分析流程
 - **适用项目**: Promptify (promptify-monorepo)
 
 ---
