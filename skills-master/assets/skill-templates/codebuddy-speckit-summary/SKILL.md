@@ -15,19 +15,29 @@ This skill extends the Speckit specification pipeline with a **Feature Registry*
 
 Install `assets/speckit.summarize.md` to `.codebuddy/commands/speckit.summarize.md`.
 
-This command runs after `speckit.implement` completes. It:
+Runs after `speckit.implement` completes:
 - Reads all spec design documents (spec.md, plan.md, data-model.md, contracts/, tasks.md)
 - Extracts feature metadata (routes, API endpoints, data tables, key directories)
 - Appends a structured entry to `specs/REGISTRY.md`
 - Updates `CODEBUDDY.md` with a one-line feature summary
 
-### 2. Registry Template
+### 2. New Command: `speckit.summarize.init`
+
+Install `assets/speckit.summarize.init.md` to `.codebuddy/commands/speckit.summarize.init.md`.
+
+Bootstraps REGISTRY for existing projects adopting Speckit for the first time:
+- Scans the entire codebase (routes, APIs, migrations, directories, package.json)
+- Generates a single `000 - Existing System` entry capturing the current state
+- Creates `specs/REGISTRY.md` from template if it doesn't exist
+- Has guard check: refuses to run if REGISTRY already has entries
+
+### 3. Registry Template
 
 Install `assets/registry-template.md` to `.specify/templates/registry-template.md`.
 
 The template defines the standard format for `specs/REGISTRY.md`, including entry structure and field rules.
 
-### 3. Project Rule: `speckit-registry`
+### 4. Project Rule: `speckit-registry`
 
 Install `assets/speckit-registry-rule.md` to `.codebuddy/rules/speckit-registry.md`.
 
@@ -41,15 +51,17 @@ This always-apply rule injects REGISTRY.md awareness into existing Speckit comma
 To install this skill into a project that uses Speckit:
 
 1. Copy `assets/speckit.summarize.md` → `.codebuddy/commands/speckit.summarize.md`
-2. Copy `assets/registry-template.md` → `.specify/templates/registry-template.md`
-3. Copy `assets/speckit-registry-rule.md` → `.codebuddy/rules/speckit-registry.md`
-
-If `specs/REGISTRY.md` does not exist, create it from the template.
+2. Copy `assets/speckit.summarize.init.md` → `.codebuddy/commands/speckit.summarize.init.md`
+3. Copy `assets/registry-template.md` → `.specify/templates/registry-template.md`
+4. Copy `assets/speckit-registry-rule.md` → `.codebuddy/rules/speckit-registry.md`
+5. If `specs/REGISTRY.md` does not exist, create it from the template.
+6. **For existing projects**: Run `/speckit.summarize.init` to scan the codebase and generate an initial `000 - Existing System` entry in the registry.
 
 ## Uninstallation
 
-Remove these three files to cleanly uninstall:
+Remove these four files to cleanly uninstall:
 - `.codebuddy/commands/speckit.summarize.md`
+- `.codebuddy/commands/speckit.summarize.init.md`
 - `.specify/templates/registry-template.md`
 - `.codebuddy/rules/speckit-registry.md`
 
