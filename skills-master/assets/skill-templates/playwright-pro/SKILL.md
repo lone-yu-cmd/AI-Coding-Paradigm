@@ -1,106 +1,129 @@
 ---
 name: "playwright-pro"
-description: "增强版 Playwright 页面分析工具：通过 CDP 连接本地已运行的 Chrome/Edge/Brave，无需新开窗口，保留登录态和扩展，一键分析页面 DOM、样式、网络请求、Console 日志和性能指标"
+description: "增强版 Playwright 页面分析工具：MUST 通过 CDP 连接本地 Chrome/Edge/Brave（保留登录态和扩展），NEVER 使用原生 Playwright 启动新浏览器实例。一键分析页面 DOM、样式、网络请求、Console 日志和性能指标"
 ---
 
 # Playwright Pro - 增强版页面分析技能
 
-通过 CDP 协议连接本地已运行的 Chromium 浏览器（Chrome/Edge/Brave），自动捕获并分析当前活动页面的内容、DOM 结构、交互元素、CSS 样式、网络请求、Console 日志和性能指标。
+> **CRITICAL**: 本技能 **MUST** 通过 CDP（Chrome DevTools Protocol）连接用户本地已运行的浏览器。**NEVER** 使用 Playwright 的 `chromium.launch()` 或 `browser.newPage()` 启动新浏览器实例。这样做是为了**保留用户的登录态、账号信息和浏览器扩展**。
 
 ---
 
-## 相比原生 Playwright 的增强
+## 强制约束（NEVER 违反）
 
-| 增强点 | 原生 Playwright | Playwright Pro |
-|--------|----------------|----------------|
-| **浏览器实例** | 每次启动全新的浏览器实例，空白状态 | 通过 CDP 连接本地已运行的浏览器，保留所有标签页和浏览状态 |
-| **登录状态** | 新实例无任何登录态，需重新登录所有网站 | 支持复用用户默认 profile（`--use-default-profile`），直接使用现有 Cookie 和 Session |
-| **浏览器扩展** | 默认不加载任何扩展，且不支持扩展分析 | 所有已安装的扩展均可用，还支持分析扩展页面的 DOM 和样式 |
-| **多浏览器支持** | 仅支持 Chromium/Firefox/WebKit | 支持 Chrome、Edge、Brave 等所有 Chromium 内核浏览器（`--browser` 参数） |
-| **使用方式** | 需编写脚本，通过代码控制浏览器导航 | 在浏览器中手动导航到目标页面，一条命令即可分析 |
-| **标签页选择** | 需代码逻辑控制 | 支持按索引或 URL 关键字模糊匹配（`--url <keyword>`） |
-| **输出能力** | 需手动编写分析逻辑和报告生成代码 | 自动生成截图、DOM 树、样式报告、无障碍快照等多维度输出 |
-| **网络请求** | 需手动监听和记录 | 内置网络请求捕获，自动记录所有请求/响应/失败 |
-| **Console 日志** | 需手动监听 | 内置 Console 日志捕获，包含 error/warn/log |
-| **性能指标** | 需手动编写 Performance API 调用 | 内置 Web Vitals 采集（TTFB/FCP/LCP/CLS）和资源加载分析 |
-| **元素分析** | 需手动编写选择器和样式提取逻辑 | 内置智能选择器，自动分析 button/input/header/card 等关键元素 |
+以下规则具有最高优先级，**NEVER** 在任何情况下违反：
 
----
+1. **NEVER** 调用 `playwright.chromium.launch()`、`playwright.firefox.launch()` 或任何 `browser.launch()` 方法
+2. **NEVER** 使用 `browser.newContext()` 或 `browser.newPage()` 创建新的浏览器上下文
+3. **NEVER** 自行拼接 Chrome/Edge/Brave 启动命令（如 `nohup "/Applications/Google Chrome.app/..." --remote-debugging-port=9222 ...`），因为手动拼接缺少 singleton lock 处理、端口检测、等待逻辑等关键步骤，**极易导致端口始终无法监听等问题**
+4. **MUST** 始终使用本技能提供的 `launch-chrome.sh` 脚本启动浏览器（该脚本已处理所有边界情况）
+5. **MUST** 始终使用本技能提供的 `connect-cdp.js` 脚本连接浏览器（底层通过 `chromium.connectOverCDP()` 实现）
+6. **MUST** 在连接前确认 CDP 端口（默认 9222）可用，如不可用则先用脚本启动调试版浏览器
 
-## When to Use
+### 为什么必须用 CDP 连接本地浏览器？
 
-### 适用场景
+- **保留登录态**：Cookie、Session、Token 等认证信息保存在本地浏览器 Profile 中，CDP 连接直接复用
+- **保留账号信息**：Google、GitHub、各类 SaaS 平台登录态均保留
+- **保留浏览器扩展**：已安装的扩展在 CDP 连接时保持可用
+- **真实用户环境**：分析用户真实浏览环境下的页面，而非无状态的干净浏览器
 
-| 场景 | 说明 |
-|------|------|
-| **分析任意网页** | 获取页面的完整 DOM 结构和样式信息 |
-| **获取页面视觉快照** | 截取页面截图，提取颜色、字体、元素尺寸等信息 |
-| **调试样式问题** | 当需要"看到"页面的真实视觉效果来诊断问题 |
-| **验证 UI 实现** | 确认 UI 组件是否按设计稿正确渲染 |
-| **分析浏览器扩展** | 检查扩展页面的视觉样式、布局和交互元素 |
-| **分析需要登录的页面** | 使用 `--use-default-profile` 复用登录态，无需重新登录 |
-| **性能诊断** | 获取 Web Vitals（TTFB/FCP/LCP/CLS）、资源加载和内存使用数据 |
-| **API 调试** | 捕获页面所有网络请求，查看请求/响应/失败详情 |
-| **Console 错误排查** | 捕获页面 Console 日志，快速定位 JS 错误和警告 |
+### 为什么 NEVER 自行拼接 Chrome 启动命令？
+
+手动拼接 `"/Applications/Google Chrome.app/..." --remote-debugging-port=9222` 会遇到以下问题：
+- **singleton lock**：Chrome 已有实例运行时，新进程会因 lock 文件而无法正确启用调试端口
+- **端口始终不监听**：即使启动命令看起来正确，端口也可能因为 profile 冲突而永远无法就绪
+- **缺少等待和重试逻辑**：需要正确等待浏览器初始化完成后端口才可用
+- **缺少进程冲突检测**：需要先检测是否有已运行的 Chrome 实例占用资源
+
+`launch-chrome.sh` 脚本已处理以上所有边界情况，**MUST** 使用它来启动浏览器。
 
 ---
 
-## Workflow（执行流程）
+## Workflow（强制执行流程）
 
-### Step 1: 环境准备（首次使用）
+使用本技能时，**MUST** 严格按照以下顺序执行，**NEVER** 跳过任何步骤。
 
-如果尚未安装依赖，运行一键安装脚本：
+### Step 1: 检查项目是否已安装 playwright-pro 脚本
+
+**MUST** 先检查目标项目中是否存在本技能的脚本文件：
 
 ```bash
-# 进入技能目录执行安装
-chmod +x scripts/setup.sh && ./scripts/setup.sh
+ls scripts/debug/launch-chrome.sh scripts/debug/connect-cdp.js 2>/dev/null
 ```
 
-安装完成后，会在当前项目创建 `scripts/debug/` 目录，包含所需的脚本文件。
+- 如果两个文件都存在 → 跳到 Step 2
+- 如果文件不存在 → **MUST** 先运行安装脚本：
+  ```bash
+  # SKILL_DIR 是本技能的安装目录（如 .codebuddy/skills/playwright-pro 或 .trae/skills/playwright-pro）
+  chmod +x ${SKILL_DIR}/scripts/setup.sh && ${SKILL_DIR}/scripts/setup.sh
+  ```
+  安装脚本会自动：
+  - 安装 playwright 依赖
+  - 复制 `launch-chrome.sh` 和 `connect-cdp.js` 到项目的 `scripts/debug/` 目录
+  - 创建 `debug-output/` 输出目录
+  - 添加 `debug:launch-chrome`、`debug:connect` 等 npm scripts 到 `package.json`
 
----
+### Step 2: 检查 CDP 连接是否可用
 
-### Step 2: 启动调试版浏览器
+**MUST** 检查调试端口是否已就绪：
 
-**在新终端中执行：**
-```bash
-# 方式一：使用独立 profile（默认，不影响现有浏览器数据）
-npm run debug:launch-chrome
-
-# 方式二：复用默认 profile（保留登录态、书签、扩展、历史记录）
-npm run debug:launch-default
-
-# 方式三：使用 Edge 或 Brave
-./scripts/debug/launch-chrome.sh --browser edge
-./scripts/debug/launch-chrome.sh --browser brave
-
-# 方式四：Edge + 默认 profile + 自定义端口
-./scripts/debug/launch-chrome.sh --browser edge --use-default-profile --port 9333
-```
-
-**预期行为：**
-- 如果检测到已有调试端口可用，直接使用，无需重启浏览器
-- 如果浏览器正在运行但无调试端口，提示选择重启方式
-- 支持 Chrome、Edge、Brave 三种浏览器
-- `--use-default-profile` 模式复用所有用户数据
-
-**验证启动成功：**
 ```bash
 curl -s http://localhost:9222/json/version
 ```
 
----
+- 如果返回 JSON 数据 → CDP 已就绪，跳到 Step 4
+- 如果连接失败 → 进入 Step 3 启动浏览器
 
-### Step 3: 在浏览器中打开目标页面
+### Step 3: 使用脚本启动调试版浏览器
+
+**MUST** 使用本技能提供的 `launch-chrome.sh` 脚本启动浏览器，**NEVER** 自行拼接启动命令：
+
+```bash
+# 方式一：使用独立 profile（默认，不影响现有浏览器数据）
+npm run debug:launch-chrome
+
+# 方式二：复用默认 profile（保留登录态、书签、扩展、历史记录）【推荐需要登录态时使用】
+npm run debug:launch-default
+
+# 方式三：直接调用脚本（效果相同）
+./scripts/debug/launch-chrome.sh
+./scripts/debug/launch-chrome.sh --use-default-profile
+
+# 方式四：使用 Edge 或 Brave
+./scripts/debug/launch-chrome.sh --browser edge
+./scripts/debug/launch-chrome.sh --browser brave
+```
+
+**脚本内置的处理逻辑（这就是为什么 MUST 使用脚本而非手动拼命令）：**
+- 自动检测已有调试端口并复用，无需重启浏览器
+- 检测 Chrome singleton lock 冲突并正确处理
+- 自动关闭无调试端口的 Chrome 实例后重启
+- 内置端口就绪等待和重试逻辑（最多等待 15 秒）
+- 跨平台浏览器路径自动检测（macOS/Linux/Windows）
+
+**如果脚本因需要交互确认而阻塞**（如提示"是否关闭 Chrome"），使用以下方式处理：
+```bash
+# 先关闭现有 Chrome，再重新调用脚本
+pkill -9 "Google Chrome" 2>/dev/null; sleep 2
+npm run debug:launch-chrome
+```
+注意：关闭后仍然 **MUST** 使用脚本重新启动，**NEVER** 自行拼接 Chrome 命令。
+
+**启动后 MUST 验证：**
+```bash
+curl -s http://localhost:9222/json/version
+```
+
+### Step 4: 在浏览器中导航到目标页面
 
 在已启动的调试版浏览器中：
 1. 导航到需要分析的目标页面
 2. 如需分析扩展，点击扩展图标打开弹窗/侧边栏
 3. 确保页面已完全加载
 
----
+### Step 5: 通过脚本连接 CDP 并分析页面
 
-### Step 4: 执行页面分析
+**MUST** 使用本技能提供的 `connect-cdp.js` 脚本分析页面：
 
 ```bash
 # 完整分析（包含网络请求、Console、性能指标）
@@ -125,13 +148,9 @@ node scripts/debug/connect-cdp.js --no-network --no-console --no-perf
 node scripts/debug/connect-cdp.js --network-wait 10
 ```
 
----
-
-### Step 5: 查看分析结果
+### Step 6: 查看分析结果
 
 **输出目录：** `debug-output/`
-
-**生成的文件：**
 
 | 文件名 | 内容 |
 |--------|------|
@@ -149,13 +168,15 @@ node scripts/debug/connect-cdp.js --network-wait 10
 
 ## 快速命令参考
 
-| 命令 | 说明 |
-|------|------|
-| `npm run debug:launch-chrome` | 启动调试版浏览器（独立 profile） |
-| `npm run debug:launch-default` | 启动调试版浏览器（复用默认 profile） |
-| `npm run debug:connect` | 完整分析当前页面 |
-| `npm run debug:fast` | 快速分析（跳过网络和性能） |
-| `npm run debug:styles` | 仅分析样式 |
+| 顺序 | 命令 | 说明 |
+|------|------|------|
+| 0 | `${SKILL_DIR}/scripts/setup.sh` | **首次使用 MUST 执行**：安装脚本到目标项目 |
+| 1 | `curl -s http://localhost:9222/json/version` | 检查 CDP 是否就绪 |
+| 2 | `npm run debug:launch-chrome` | 启动调试版浏览器（独立 profile） |
+| 2 | `npm run debug:launch-default` | 启动调试版浏览器（复用默认 profile，保留登录态） |
+| 3 | `npm run debug:connect` | 通过 CDP 完整分析当前页面 |
+| 3 | `npm run debug:fast` | 通过 CDP 快速分析（跳过网络和性能） |
+| 3 | `npm run debug:styles` | 通过 CDP 仅分析样式 |
 
 ---
 
@@ -187,7 +208,7 @@ node scripts/debug/connect-cdp.js --network-wait 10
 | 变量名 | 默认值 | 说明 |
 |--------|--------|------|
 | `DEBUG_OUTPUT_DIR` | `./debug-output` | 输出目录路径 |
-| `CDP_PORT` | `9222` | 浏览器调试端口 |
+| `CDP_PORT` | `9222` | 浏览器 CDP 调试端口 |
 | `CHROME_PATH` | 自动检测 | 浏览器可执行文件路径 |
 | `BROWSER_TYPE` | `chrome` | 浏览器类型：chrome/edge/brave |
 
@@ -197,10 +218,12 @@ node scripts/debug/connect-cdp.js --network-wait 10
 
 | 问题 | 原因 | 解决方案 |
 |------|------|----------|
-| 端口被占用 | 已有浏览器实例 | 脚本会自动检测已有调试端口并复用 |
+| 脚本不存在 | 未运行 setup.sh | **MUST** 先运行 `${SKILL_DIR}/scripts/setup.sh` 安装脚本到项目 |
+| `curl localhost:9222` 无响应 | 浏览器未以调试模式启动 | **MUST** 使用 `launch-chrome.sh` 脚本启动，**NEVER** 手动拼命令 |
+| 端口始终不监听 | 手动拼接 Chrome 命令导致 singleton lock | 关闭所有 Chrome 后使用 `launch-chrome.sh` 脚本重新启动 |
+| 端口被占用 | 已有浏览器实例占用端口 | 脚本会自动检测已有调试端口并复用 |
 | 浏览器未找到 | 非标准安装路径 | 设置 `CHROME_PATH` 或使用 `--browser` 参数 |
-| 连接失败 | 浏览器未以调试模式启动 | 先运行 `debug:launch-chrome` |
-| 想保留登录态 | 使用独立 profile 启动 | 使用 `--use-default-profile` 选项 |
+| 需要保留登录态 | 使用了独立 profile | 使用 `--use-default-profile` 复用默认 profile |
 | 标签页太多找不到 | 索引方式不方便 | 使用 `--url <关键字>` 按 URL 匹配 |
 | 分析太慢 | 网络请求捕获需刷新页面 | 使用 `debug:fast` 或 `--no-network` |
 
@@ -217,15 +240,13 @@ node scripts/debug/connect-cdp.js --network-wait 10
 ### 安装步骤
 
 ```bash
-# 1. 安装 playwright
-npm install -D playwright
-
-# 2. 运行安装脚本（自动配置）
-chmod +x scripts/setup.sh && ./scripts/setup.sh
+# 运行安装脚本（自动配置一切）
+chmod +x ${SKILL_DIR}/scripts/setup.sh && ${SKILL_DIR}/scripts/setup.sh
 ```
 
 安装脚本会自动：
-- 复制核心脚本到 `scripts/debug/` 目录
+- 安装 playwright 到项目依赖
+- 复制 `launch-chrome.sh` 和 `connect-cdp.js` 到 `scripts/debug/` 目录
 - 创建 `debug-output/` 输出目录
 - 添加 npm scripts 到 `package.json`
 

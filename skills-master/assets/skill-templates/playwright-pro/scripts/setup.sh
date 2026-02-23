@@ -264,19 +264,67 @@ EOF
     echo ""
 }
 
+# 确保 package.json 中有 "type": "module"（connect-cdp.js 使用 ESM import 语法）
+ensure_esm_support() {
+    echo -e "${YELLOW}📦 检查 ESM 支持...${NC}"
+    
+    cd "$PROJECT_ROOT"
+    
+    # 检查是否已有 "type": "module"
+    if grep -q '"type"[[:space:]]*:[[:space:]]*"module"' package.json 2>/dev/null; then
+        echo -e "   ${GREEN}✓${NC} package.json 已设置 \"type\": \"module\""
+        return
+    fi
+    
+    # 检查是否有 "type": "commonjs" 或其他 type
+    if grep -q '"type"' package.json 2>/dev/null; then
+        echo -e "   ${YELLOW}⚠️${NC} package.json 中 \"type\" 不是 \"module\""
+        echo -e "   ${YELLOW}⚠️${NC} connect-cdp.js 使用 ESM import 语法，需要 \"type\": \"module\""
+        echo -e "   ${YELLOW}⚠️${NC} 如果项目使用 CommonJS，请将 connect-cdp.js 重命名为 connect-cdp.mjs"
+        
+        # 重命名为 .mjs 以兼容 CommonJS 项目
+        if [ -f "$PROJECT_ROOT/scripts/debug/connect-cdp.js" ]; then
+            cp "$PROJECT_ROOT/scripts/debug/connect-cdp.js" "$PROJECT_ROOT/scripts/debug/connect-cdp.mjs"
+            echo -e "   ${GREEN}✓${NC} 已创建 connect-cdp.mjs（ESM 兼容副本）"
+            USE_MJS=true
+        fi
+        return
+    fi
+    
+    # 没有 type 字段，添加 "type": "module"
+    if command -v jq &> /dev/null; then
+        local tmp_file=$(mktemp)
+        jq '. + {"type": "module"}' package.json > "$tmp_file"
+        mv "$tmp_file" package.json
+        echo -e "   ${GREEN}✓${NC} 已添加 \"type\": \"module\" 到 package.json"
+    else
+        echo -e "   ${YELLOW}⚠️${NC} 未找到 jq，请手动添加 \"type\": \"module\" 到 package.json"
+        echo -e "   ${YELLOW}⚠️${NC} 或将 scripts/debug/connect-cdp.js 重命名为 connect-cdp.mjs"
+    fi
+    
+    echo ""
+}
+
 # 更新 package.json scripts
 update_package_scripts() {
     echo -e "${YELLOW}📝 更新 package.json 脚本...${NC}"
     
     cd "$PROJECT_ROOT"
     
+    # 根据 ESM 兼容性决定脚本命令中的文件名
+    local cdp_script="scripts/debug/connect-cdp.js"
+    if [ "$USE_MJS" = true ]; then
+        cdp_script="scripts/debug/connect-cdp.mjs"
+    fi
+    
     if command -v jq &> /dev/null; then
         local tmp_file=$(mktemp)
-        jq '.scripts["debug:connect"] = "node scripts/debug/connect-cdp.js" |
-            .scripts["debug:styles"] = "node scripts/debug/connect-cdp.js 0" |
+        jq --arg cdp "$cdp_script" \
+            '.scripts["debug:connect"] = ("node " + $cdp) |
+            .scripts["debug:styles"] = ("node " + $cdp + " 0") |
             .scripts["debug:launch-chrome"] = "./scripts/debug/launch-chrome.sh" |
             .scripts["debug:launch-default"] = "./scripts/debug/launch-chrome.sh --use-default-profile" |
-            .scripts["debug:fast"] = "node scripts/debug/connect-cdp.js --no-network --no-perf"' \
+            .scripts["debug:fast"] = ("node " + $cdp + " --no-network --no-perf")' \
             package.json > "$tmp_file"
         mv "$tmp_file" package.json
         echo -e "   ${GREEN}✓${NC} 已添加调试脚本到 package.json"
@@ -284,11 +332,11 @@ update_package_scripts() {
         echo -e "   ${YELLOW}⚠️${NC} 未找到 jq，请手动添加以下脚本到 package.json:"
         echo ""
         echo -e "${BLUE}   \"scripts\": {"
-        echo '     "debug:connect": "node scripts/debug/connect-cdp.js",'
-        echo '     "debug:styles": "node scripts/debug/connect-cdp.js 0",'
+        echo "     \"debug:connect\": \"node $cdp_script\","
+        echo "     \"debug:styles\": \"node $cdp_script 0\","
         echo '     "debug:launch-chrome": "./scripts/debug/launch-chrome.sh",'
         echo '     "debug:launch-default": "./scripts/debug/launch-chrome.sh --use-default-profile",'
-        echo '     "debug:fast": "node scripts/debug/connect-cdp.js --no-network --no-perf"'
+        echo "     \"debug:fast\": \"node $cdp_script --no-network --no-perf\""
         echo -e "   }${NC}"
     fi
     
@@ -392,10 +440,12 @@ print_usage() {
 # =============================================================================
 
 main() {
+    USE_MJS=false
     check_requirements
     detect_project
     install_dependencies
     setup_scripts
+    ensure_esm_support
     update_package_scripts
     
     if verify_installation; then
