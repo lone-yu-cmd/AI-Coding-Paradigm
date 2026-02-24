@@ -81,6 +81,8 @@ setup.sh 会自动完成：
 
 **关键点**：`--cdp-endpoint http://localhost:9222` 让 Playwright MCP 连接到已启动的调试浏览器，而非启动一个无登录态的空白浏览器。
 
+> ⚠️ **请手动检查**：AI 无法直接读取或修改 IDE 的 MCP 配置文件。请自行确认你的 MCP 配置中 `playwright` 的 `args` 包含 `"--cdp-endpoint", "http://localhost:9222"`。如果缺少这两项，Playwright MCP 会启动一个全新的空白浏览器，**不含任何登录态**。
+
 ---
 
 ## 使用流程
