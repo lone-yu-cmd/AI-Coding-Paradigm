@@ -10,7 +10,6 @@
 #   ./launch-chrome.sh [选项]
 #   
 # 选项：
-#   --isolated-profile      使用独立调试 profile（不含登录态）
 #   --profile <name>        指定 profile 目录名（如 "Default", "Profile 1"）
 #   --browser <name>        指定浏览器：chrome（默认）、edge、brave
 #   --port <number>         调试端口（默认：9222）
@@ -26,7 +25,6 @@
 # 默认配置
 DEBUG_PORT=${DEBUG_PORT:-9222}
 BROWSER_TYPE=${BROWSER_TYPE:-chrome}
-USE_DEFAULT_PROFILE=true
 AUTO_YES=false
 PROFILE_NAME=""  # 用户指定的 profile 目录名（如 "Default", "Profile 1"）
 
@@ -40,7 +38,6 @@ show_help() {
     echo "用法: ./launch-chrome.sh [选项]"
     echo ""
     echo "选项:"
-    echo "  --isolated-profile      使用独立调试 profile（不含登录态和浏览器数据）"
     echo "  --profile <name>        指定 profile 目录名（如 'Default', 'Profile 1'）"
     echo "  --browser <name>        指定浏览器: chrome (默认), edge, brave"
     echo "  --port <number>         调试端口（默认: 9222）"
@@ -48,9 +45,8 @@ show_help() {
     echo "  --help                  显示此帮助信息"
     echo ""
     echo "默认行为："
-    echo "  默认复用用户的浏览器 profile（保留登录态、书签、扩展、历史记录）"
+    echo "  克隆用户的浏览器 profile 启动调试浏览器（保留登录态、书签、扩展、历史记录）"
     echo "  自动检测最近使用的 profile，或通过 --profile 指定"
-    echo "  使用 --isolated-profile 可切换为独立调试 profile"
     echo ""
     echo "环境变量:"
     echo "  DEBUG_PORT    调试端口（默认: 9222）"
@@ -58,24 +54,14 @@ show_help() {
     echo "  BROWSER_TYPE  浏览器类型: chrome/edge/brave（默认: chrome）"
     echo ""
     echo "示例:"
-    echo "  ./launch-chrome.sh                                # 复用默认 profile（保留登录态）"
+    echo "  ./launch-chrome.sh                                # 克隆默认 profile（保留登录态）"
     echo "  ./launch-chrome.sh --profile 'Profile 1'          # 指定特定 profile"
-    echo "  ./launch-chrome.sh --isolated-profile             # 使用独立调试 profile"
     echo "  ./launch-chrome.sh --yes                          # 非交互模式，自动确认"
     echo "  ./launch-chrome.sh --browser edge                 # 使用 Edge"
 }
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --use-default-profile)
-            # 向后兼容：默认已经是 true，保留此参数不报错
-            USE_DEFAULT_PROFILE=true
-            shift
-            ;;
-        --isolated-profile)
-            USE_DEFAULT_PROFILE=false
-            shift
-            ;;
         --profile)
             PROFILE_NAME="$2"
             shift 2
@@ -235,6 +221,126 @@ get_browser_process_pattern() {
 }
 
 # =============================================================================
+# Playwright MCP 自动配置
+# =============================================================================
+
+# 配置单个 IDE 的 Playwright MCP（添加 --cdp-endpoint）
+configure_mcp_file() {
+    local mcp_file="$1"
+    local ide_name="$2"
+    local cdp_url="http://localhost:$DEBUG_PORT"
+    
+    if [[ ! -f "$mcp_file" ]]; then
+        return 1
+    fi
+    
+    if ! command -v jq &>/dev/null; then
+        return 2
+    fi
+    
+    # 检查是否存在 playwright server 配置
+    local has_playwright=$(jq -r '.mcpServers.playwright // empty' "$mcp_file" 2>/dev/null)
+    if [[ -z "$has_playwright" ]]; then
+        return 3
+    fi
+    
+    # 检查是否已经配置了 --cdp-endpoint
+    local has_cdp=$(jq -r '.mcpServers.playwright.args | if . then map(select(. == "--cdp-endpoint")) | length else 0 end' "$mcp_file" 2>/dev/null)
+    if [[ "$has_cdp" -gt 0 ]]; then
+        # 已有 --cdp-endpoint，检查端口值是否正确
+        local current_url=$(jq -r '
+            .mcpServers.playwright.args as $args |
+            ($args | to_entries | map(select(.value == "--cdp-endpoint")) | .[0].key) as $idx |
+            if $idx then $args[$idx + 1] else "" end
+        ' "$mcp_file" 2>/dev/null)
+        
+        if [[ "$current_url" == "$cdp_url" ]]; then
+            echo "   ✅ $ide_name: 已正确配置 (--cdp-endpoint $cdp_url)"
+            return 0
+        fi
+        
+        # 更新端口值
+        local tmp_file=$(mktemp)
+        jq --arg url "$cdp_url" '
+            (.mcpServers.playwright.args | to_entries | .[] | select(.value == "--cdp-endpoint").key) as $idx |
+            .mcpServers.playwright.args[$idx + 1] = $url
+        ' "$mcp_file" > "$tmp_file" 2>/dev/null
+        
+        if [[ -s "$tmp_file" ]] && jq empty "$tmp_file" 2>/dev/null; then
+            mv "$tmp_file" "$mcp_file"
+            echo "   ✅ $ide_name: 已更新端口 → $cdp_url"
+            return 0
+        fi
+        rm -f "$tmp_file"
+        return 4
+    fi
+    
+    # 没有 --cdp-endpoint，添加到 args 数组
+    local tmp_file=$(mktemp)
+    jq --arg url "$cdp_url" '
+        .mcpServers.playwright.args += ["--cdp-endpoint", $url]
+    ' "$mcp_file" > "$tmp_file" 2>/dev/null
+    
+    if [[ -s "$tmp_file" ]] && jq empty "$tmp_file" 2>/dev/null; then
+        mv "$tmp_file" "$mcp_file"
+        echo "   ✅ $ide_name: 已添加 --cdp-endpoint $cdp_url"
+        return 0
+    fi
+    rm -f "$tmp_file"
+    return 4
+}
+
+# 配置所有支持的 IDE 的 Playwright MCP
+configure_playwright_mcp() {
+    local configured=0
+    local no_jq=false
+    
+    echo ""
+    echo "🔧 配置 Playwright MCP 连接..."
+    
+    # 各 IDE 的 MCP 配置文件路径
+    declare -a IDE_NAMES=("CodeBuddy" "Cursor" "Trae" "Windsurf" "VS Code")
+    declare -a MCP_FILES=(
+        "$HOME/.codebuddy/mcp.json"
+        "$HOME/.cursor/mcp.json"
+        "$HOME/.trae/mcp.json"
+        "$HOME/.windsurf/mcp.json"
+        "$HOME/.vscode/mcp.json"
+    )
+    
+    for i in "${!MCP_FILES[@]}"; do
+        local mcp_file="${MCP_FILES[$i]}"
+        local ide_name="${IDE_NAMES[$i]}"
+        
+        configure_mcp_file "$mcp_file" "$ide_name"
+        local result=$?
+        
+        case $result in
+            0) ((configured++)) ;;
+            2) no_jq=true ;;
+        esac
+    done
+    
+    if [[ "$configured" -eq 0 ]]; then
+        if [[ "$no_jq" == true ]]; then
+            echo "   ⚠️  未找到 jq，请手动配置 Playwright MCP:"
+            echo ""
+            echo "   在 IDE 的 MCP 配置中添加 --cdp-endpoint:"
+            echo "   {"
+            echo "     \"mcpServers\": {"
+            echo "       \"playwright\": {"
+            echo "         \"command\": \"npx\","
+            echo "         \"args\": [\"@playwright/mcp@latest\", \"--cdp-endpoint\", \"http://localhost:$DEBUG_PORT\"]"
+            echo "       }"
+            echo "     }"
+            echo "   }"
+        else
+            echo "   ℹ️  未检测到 IDE 的 Playwright MCP 配置，跳过"
+        fi
+    fi
+}
+
+# =============================================================================
 # 检测与连接逻辑
 # =============================================================================
 
@@ -259,6 +365,10 @@ try_connect_existing() {
             echo "   浏览器: $browser_name"
             echo "   端口: $DEBUG_PORT"
             echo "   可以直接运行分析脚本连接"
+            
+            # 确保 MCP 配置也是正确的
+            configure_playwright_mcp
+            
             return 0
         fi
     fi
@@ -298,11 +408,7 @@ echo "🔧 Playwright Pro - Browser Debug Launcher"
 echo "   浏览器: $BROWSER_DISPLAY_NAME"
 echo "   路径: $BROWSER_PATH"
 echo "   端口: $DEBUG_PORT"
-if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
-    echo "   配置: 默认 profile（保留登录态和数据）"
-else
-    echo "   配置: 独立调试 profile（无登录态）"
-fi
+echo "   配置: 克隆用户 profile（保留登录态和数据）"
 if [[ "$AUTO_YES" == true ]]; then
     echo "   模式: 非交互（自动确认）"
 fi
@@ -408,15 +514,9 @@ if is_browser_running "$BROWSER_PROCESS"; then
     echo "⚠️  $BROWSER_DISPLAY_NAME 正在运行，但未开启调试端口"
     echo ""
     
-    if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
-        echo "⚡ 使用默认 profile 模式需要重启浏览器"
-        echo "   重要: 这将关闭所有 $BROWSER_DISPLAY_NAME 窗口/标签页！"
-        echo "   （登录态和数据不会丢失，因为使用的是同一个 profile）"
-    else
-        echo "⚡ 提示: 使用独立 profile 模式"
-        echo "   将启动一个新的浏览器窗口，不影响当前运行的实例"
-        echo "   但需要先关闭当前浏览器才能使用调试端口"
-    fi
+    echo "⚡ 需要重启浏览器以启用调试端口"
+    echo "   重要: 这将关闭所有 $BROWSER_DISPLAY_NAME 窗口/标签页！"
+    echo "   （登录态和数据不会丢失，会自动克隆用户 profile）"
     
     echo ""
     
@@ -454,96 +554,89 @@ fi
 echo ""
 echo "🚀 正在以调试模式启动 $BROWSER_DISPLAY_NAME..."
 
-# Step 3: 确定 profile 目录
+# Step 3: 克隆用户 profile 并确定启动参数
 LAUNCH_ARGS=("--remote-debugging-port=$DEBUG_PORT")
 
-if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
-    SOURCE_PROFILE_DIR=$(get_default_profile_dir "$BROWSER_TYPE")
-    
-    # 确定要使用的 profile 子目录
-    if [[ -n "$PROFILE_NAME" ]]; then
-        if [[ ! -d "$SOURCE_PROFILE_DIR/$PROFILE_NAME" ]]; then
-            echo "❌ 指定的 profile 不存在: $SOURCE_PROFILE_DIR/$PROFILE_NAME"
-            echo ""
-            echo "   可用的 profile:"
-            list_profiles "$SOURCE_PROFILE_DIR"
-            exit 1
-        fi
-        SELECTED_PROFILE="$PROFILE_NAME"
-    else
-        SELECTED_PROFILE=$(detect_recent_profile "$SOURCE_PROFILE_DIR")
+SOURCE_PROFILE_DIR=$(get_default_profile_dir "$BROWSER_TYPE")
+
+# 确定要使用的 profile 子目录
+if [[ -n "$PROFILE_NAME" ]]; then
+    if [[ ! -d "$SOURCE_PROFILE_DIR/$PROFILE_NAME" ]]; then
+        echo "❌ 指定的 profile 不存在: $SOURCE_PROFILE_DIR/$PROFILE_NAME"
+        echo ""
+        echo "   可用的 profile:"
+        list_profiles "$SOURCE_PROFILE_DIR"
+        exit 1
     fi
-    
-    echo "👤 使用 profile: $SELECTED_PROFILE"
-    
-    # 显示 profile 中的用户名
-    PREF_FILE="$SOURCE_PROFILE_DIR/$SELECTED_PROFILE/Preferences"
-    if [[ -f "$PREF_FILE" ]]; then
-        PROFILE_USER_NAME=$(grep -o '"name":"[^"]*"' "$PREF_FILE" 2>/dev/null | head -1 | cut -d'"' -f4)
-        if [[ -n "$PROFILE_USER_NAME" ]]; then
-            echo "   用户: $PROFILE_USER_NAME"
-        fi
-    fi
-    
-    # Chrome 安全限制：使用默认 data directory 时拒绝启用远程调试端口
-    # 解决方案：克隆用户 profile 的关键文件到独立 data directory
-    # 这样既能保留登录态（Cookies、Session 等），又能启用调试端口
-    CLONE_DIR="$HOME/.playwright-pro-clone-$BROWSER_TYPE"
-    CLONE_PROFILE_DIR="$CLONE_DIR/Default"
-    
-    echo ""
-    echo "📋 正在同步 profile 数据（保留登录态）..."
-    
-    mkdir -p "$CLONE_PROFILE_DIR"
-    
-    # 复制关键文件（登录态、扩展、配置等），跳过缓存等大文件
-    PROFILE_FILES=(
-        "Cookies"
-        "Login Data"
-        "Web Data"
-        "Preferences"
-        "Secure Preferences"
-        "Bookmarks"
-        "Local Storage"
-        "Session Storage"
-        "IndexedDB"
-        "Extensions"
-        "Extension State"
-        "Extension Rules"
-        "Extension Scripts"
-    )
-    
-    SOURCE_DIR="$SOURCE_PROFILE_DIR/$SELECTED_PROFILE"
-    COPY_COUNT=0
-    
-    for f in "${PROFILE_FILES[@]}"; do
-        if [[ -e "$SOURCE_DIR/$f" ]]; then
-            # 使用 rsync 增量同步（如果可用），否则用 cp
-            if command -v rsync &>/dev/null; then
-                rsync -a --delete "$SOURCE_DIR/$f" "$CLONE_PROFILE_DIR/" 2>/dev/null
-            else
-                rm -rf "$CLONE_PROFILE_DIR/$f" 2>/dev/null
-                cp -a "$SOURCE_DIR/$f" "$CLONE_PROFILE_DIR/" 2>/dev/null
-            fi
-            ((COPY_COUNT++))
-        fi
-    done
-    
-    # 复制 Local State（在 user-data-dir 根目录）
-    if [[ -f "$SOURCE_PROFILE_DIR/Local State" ]]; then
-        cp -a "$SOURCE_PROFILE_DIR/Local State" "$CLONE_DIR/" 2>/dev/null
-    fi
-    
-    echo "   ✅ 已同步 $COPY_COUNT 项数据"
-    
-    LAUNCH_ARGS+=("--user-data-dir=$CLONE_DIR")
-    LAUNCH_ARGS+=("--profile-directory=Default")
+    SELECTED_PROFILE="$PROFILE_NAME"
 else
-    PROFILE_DIR="$HOME/.playwright-pro-debug-profile-$BROWSER_TYPE"
-    mkdir -p "$PROFILE_DIR"
-    echo "📁 使用独立 profile: $PROFILE_DIR"
-    LAUNCH_ARGS+=("--user-data-dir=$PROFILE_DIR")
+    SELECTED_PROFILE=$(detect_recent_profile "$SOURCE_PROFILE_DIR")
 fi
+
+echo "👤 使用 profile: $SELECTED_PROFILE"
+
+# 显示 profile 中的用户名
+PREF_FILE="$SOURCE_PROFILE_DIR/$SELECTED_PROFILE/Preferences"
+if [[ -f "$PREF_FILE" ]]; then
+    PROFILE_USER_NAME=$(grep -o '"name":"[^"]*"' "$PREF_FILE" 2>/dev/null | head -1 | cut -d'"' -f4)
+    if [[ -n "$PROFILE_USER_NAME" ]]; then
+        echo "   用户: $PROFILE_USER_NAME"
+    fi
+fi
+
+# Chrome 安全限制：使用默认 data directory 时拒绝启用远程调试端口
+# 解决方案：克隆用户 profile 的关键文件到独立 data directory
+# 这样既能保留登录态（Cookies、Session 等），又能启用调试端口
+CLONE_DIR="$HOME/.playwright-pro-clone-$BROWSER_TYPE"
+CLONE_PROFILE_DIR="$CLONE_DIR/Default"
+
+echo ""
+echo "📋 正在同步 profile 数据（保留登录态）..."
+
+mkdir -p "$CLONE_PROFILE_DIR"
+
+# 复制关键文件（登录态、扩展、配置等），跳过缓存等大文件
+PROFILE_FILES=(
+    "Cookies"
+    "Login Data"
+    "Web Data"
+    "Preferences"
+    "Secure Preferences"
+    "Bookmarks"
+    "Local Storage"
+    "Session Storage"
+    "IndexedDB"
+    "Extensions"
+    "Extension State"
+    "Extension Rules"
+    "Extension Scripts"
+)
+
+SOURCE_DIR="$SOURCE_PROFILE_DIR/$SELECTED_PROFILE"
+COPY_COUNT=0
+
+for f in "${PROFILE_FILES[@]}"; do
+    if [[ -e "$SOURCE_DIR/$f" ]]; then
+        # 使用 rsync 增量同步（如果可用），否则用 cp
+        if command -v rsync &>/dev/null; then
+            rsync -a --delete "$SOURCE_DIR/$f" "$CLONE_PROFILE_DIR/" 2>/dev/null
+        else
+            rm -rf "$CLONE_PROFILE_DIR/$f" 2>/dev/null
+            cp -a "$SOURCE_DIR/$f" "$CLONE_PROFILE_DIR/" 2>/dev/null
+        fi
+        ((COPY_COUNT++))
+    fi
+done
+
+# 复制 Local State（在 user-data-dir 根目录）
+if [[ -f "$SOURCE_PROFILE_DIR/Local State" ]]; then
+    cp -a "$SOURCE_PROFILE_DIR/Local State" "$CLONE_DIR/" 2>/dev/null
+fi
+
+echo "   ✅ 已同步 $COPY_COUNT 项数据"
+
+LAUNCH_ARGS+=("--user-data-dir=$CLONE_DIR")
+LAUNCH_ARGS+=("--profile-directory=Default")
 
 echo ""
 
@@ -561,11 +654,13 @@ for i in {1..15}; do
         echo ""
         echo "🔗 现在可以运行分析脚本了"
         echo "   例如: node connect-cdp.js"
-        if [[ "$USE_DEFAULT_PROFILE" == true ]]; then
-            echo ""
-            echo "💡 已克隆用户 profile，登录态和扩展均已可用"
-            echo "   注意: 在此浏览器中的新登录/修改不会同步回原 profile"
-        fi
+        echo ""
+        echo "💡 已克隆用户 profile，登录态和扩展均已可用"
+        echo "   注意: 在此浏览器中的新登录/修改不会同步回原 profile"
+        
+        # Step 6: 自动配置 Playwright MCP 的 --cdp-endpoint
+        configure_playwright_mcp
+        
         exit 0
     fi
     echo -n "."

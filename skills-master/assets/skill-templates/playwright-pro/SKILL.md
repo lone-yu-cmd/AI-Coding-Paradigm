@@ -88,18 +88,14 @@ curl -s http://localhost:9222/json/version
 **MUST** 使用本技能提供的 `launch-chrome.sh` 脚本启动浏览器，**NEVER** 自行拼接启动命令：
 
 ```bash
-# 方式一：默认启动（复用用户 profile，保留登录态、书签、扩展、历史记录）
+# 方式一：默认启动（克隆用户 profile，保留登录态、书签、扩展、历史记录）
 npm run debug:launch-chrome
 
-# 方式二：使用独立调试 profile（不含登录态和浏览器数据）
-npm run debug:launch-isolated
-
-# 方式三：直接调用脚本（默认复用用户 profile）
+# 方式二：直接调用脚本
 ./scripts/debug/launch-chrome.sh
 ./scripts/debug/launch-chrome.sh --yes                 # 非交互模式（AI/CI 使用）
-./scripts/debug/launch-chrome.sh --isolated-profile    # 独立 profile
 
-# 方式四：使用 Edge 或 Brave
+# 方式三：使用 Edge 或 Brave
 ./scripts/debug/launch-chrome.sh --browser edge
 ./scripts/debug/launch-chrome.sh --browser brave
 ```
@@ -110,6 +106,7 @@ npm run debug:launch-isolated
 - 自动关闭无调试端口的 Chrome 实例后重启
 - 内置端口就绪等待和重试逻辑（最多等待 15 秒）
 - 跨平台浏览器路径自动检测（macOS/Linux/Windows）
+- **自动配置 Playwright MCP 的 `--cdp-endpoint`**，让 MCP 连接到已启动的调试浏览器（而非启动空白实例）
 
 **如果脚本因需要交互确认而阻塞**（如提示"是否关闭 Chrome"），使用 `--yes` 参数：
 ```bash
@@ -184,8 +181,7 @@ node scripts/debug/connect-cdp.js --network-wait 10
 |------|------|------|
 | 0 | `${SKILL_DIR}/scripts/setup.sh` | **首次使用 MUST 执行**：安装脚本到目标项目 |
 | 1 | `curl -s http://localhost:9222/json/version` | 检查 CDP 是否就绪 |
-| 2 | `npm run debug:launch-chrome` | 启动调试版浏览器（默认复用用户 profile，保留登录态） |
-| 2 | `npm run debug:launch-isolated` | 启动调试版浏览器（独立 profile，无登录态） |
+| 2 | `npm run debug:launch-chrome` | 启动调试版浏览器（克隆用户 profile，保留登录态） |
 | 3 | `npm run debug:connect` | 通过 CDP 完整分析当前页面 |
 | 3 | `npm run debug:fast` | 通过 CDP 快速分析（跳过网络和性能） |
 | 3 | `npm run debug:styles` | 通过 CDP 仅分析样式 |
@@ -198,12 +194,12 @@ node scripts/debug/connect-cdp.js --network-wait 10
 
 | 参数 | 说明 |
 |------|------|
-| `--isolated-profile` | 使用独立调试 profile（不含登录态和浏览器数据） |
+| `--profile <name>` | 指定 profile 目录名（如 `Default`、`Profile 1`） |
 | `--yes`, `-y` | 非交互模式，自动确认所有提示（AI/CI 调用推荐） |
 | `--browser <name>` | 指定浏览器：`chrome`（默认）、`edge`、`brave` |
 | `--port <number>` | 调试端口（默认：9222） |
 
-> **注意**：默认复用用户的浏览器 profile（保留登录态），无需额外参数。
+> **注意**：默认克隆用户的浏览器 profile（保留登录态），无需额外参数。
 
 ### connect-cdp.js
 
@@ -238,10 +234,10 @@ node scripts/debug/connect-cdp.js --network-wait 10
 | 端口始终不监听 | 手动拼接 Chrome 命令导致 singleton lock | 关闭所有 Chrome 后使用 `launch-chrome.sh` 脚本重新启动 |
 | 端口被占用 | 已有浏览器实例占用端口 | 脚本会自动检测已有调试端口并复用 |
 | 浏览器未找到 | 非标准安装路径 | 设置 `CHROME_PATH` 或使用 `--browser` 参数 |
-| 需要保留登录态 | 默认行为 | 默认已复用用户 profile，无需额外参数 |
-| 不需要登录态 | 想用干净浏览器 | 使用 `--isolated-profile` 参数 |
+| 需要保留登录态 | 默认行为 | 默认已克隆用户 profile，无需额外参数 |
 | 标签页太多找不到 | 索引方式不方便 | 使用 `--url <关键字>` 按 URL 匹配 |
 | 分析太慢 | 网络请求捕获需刷新页面 | 使用 `debug:fast` 或 `--no-network` |
+| Playwright MCP 启动空白浏览器 | MCP 未配置 `--cdp-endpoint` | `launch-chrome.sh` 会自动配置，运行后重启 IDE 的 MCP |
 
 ---
 
