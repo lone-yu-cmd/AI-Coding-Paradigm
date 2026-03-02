@@ -51,6 +51,23 @@ Analyze project structure:
 python3 skills/context-project-analyzer/scripts/analyze.py
 ```
 
+### prizm-kit Commands
+
+List available prizm-kit skills:
+```bash
+python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --list
+```
+
+Install all prizm-kit skills with hooks:
+```bash
+python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --target .codebuddy/skills --hooks --project-root .
+```
+
+Install a specific prizm-kit skill:
+```bash
+python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --skill prizmkit-init --target .codebuddy/skills
+```
+
 ### Rule-Master Commands
 
 Generate project rules interactively:
@@ -95,7 +112,7 @@ SkillsMaster/
 ├── skills-master/                    # Skill management system
 │   ├── SKILL.md                     # Master skill definition
 │   ├── scripts/install.py           # Installation tool
-│   └── assets/skill-templates/      # Template library (13+ skills)
+│   └── assets/skill-templates/      # Template library (13+ skills + prizm-kit)
 ├── rule-master/                      # Rule generation system
 │   ├── main.py                      # Interactive rule generator
 │   ├── rules/                       # Rule definitions (11 JSON files)
@@ -230,6 +247,11 @@ The three core modules work together:
 
 ### Subagent Creation
 - **subagent-creator**: Interactive wizard for creating subagent configurations
+
+### prizm-kit (Full-Lifecycle Toolkit)
+- **prizm-kit**: 28-skill self-improving dev toolkit — spec-driven development, Prizm docs, learning memory, quality, debugging, deployment, knowledge management
+- Install: `python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --target .codebuddy/skills --hooks --project-root .`
+- List skills: `python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --list`
 
 ## Development Guidelines
 

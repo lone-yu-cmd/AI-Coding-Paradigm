@@ -28,6 +28,16 @@ The following skill templates are available in `assets/skill-templates/`:
 *   **codebuddy-speckit-summary**: Extends the Speckit pipeline with a Feature Registry system. This skill should be used when working with Speckit commands (speckit.specify, speckit.plan, speckit.implement) to maintain a centralized feature index. It adds a speckit.summarize command for archiving completed features and injects REGISTRY.md awareness into existing Speckit commands via a project rule.
 *   **codebuddy-speckit-code-review**: Adds a speckit.codereview command to the Speckit pipeline for automated code review after implementation. Reviews code against the feature spec, plan, and best practices. Sits between implement and summarize in the pipeline. Trigger keywords include speckit, review, code review, CR.
 
+*   **prizm-kit**: Full-lifecycle self-improving dev toolkit (28 skills). Covers spec-driven development, Prizm context docs, learning memory, code quality, debugging, deployment, and knowledge management. Install with `install-prizmkit.py`. Skills include:
+    - Foundation: prizmkit-init, prizmkit-memory, prizmkit-evolution
+    - Documentation: prizmkit-prizm-docs (AI-only progressive context loading)
+    - Spec-Driven: prizmkit-specify, prizmkit-clarify, prizmkit-plan, prizmkit-tasks, prizmkit-implement, prizmkit-code-review, prizmkit-summarize
+    - Commit & Retrospective: prizmkit-committer, prizmkit-retrospective
+    - Quality: prizmkit-security-audit, prizmkit-dependency-health, prizmkit-tech-debt-tracker
+    - Operations: prizmkit-ci-cd-generator, prizmkit-deployment-strategy, prizmkit-db-migration, prizmkit-monitoring-setup
+    - Debugging: prizmkit-error-triage, prizmkit-log-analyzer, prizmkit-perf-profiler, prizmkit-bug-reproducer
+    - Knowledge: prizmkit-onboarding-generator, prizmkit-api-doc-generator, prizmkit-adr-manager, prizmkit-knowledge-extractor
+
 ## Instructions
 If you want to use the following command, you need to change the current directory to the upper directory of `skills/`.
 
@@ -48,4 +58,20 @@ python3 skills/skills-master/scripts/install.py --name auto-committer
 To bootstrap a full environment:
 ```bash
 python3 skills/skills-master/scripts/install.py --all
+```
+
+### Install prizm-kit
+To install the prizm-kit comprehensive development toolkit:
+```bash
+python3 skills/skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --target skills/ --hooks --project-root .
+```
+
+To list available prizm-kit skills:
+```bash
+python3 skills/skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --list
+```
+
+To install a specific prizm-kit skill:
+```bash
+python3 skills/skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --skill prizmkit-init --target skills/
 ```

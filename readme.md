@@ -121,6 +121,62 @@ These three modules work together to create a powerful AI development ecosystem:
 | **codebuddy-speckit-summary** | Extends the Speckit pipeline with a Feature Registry system. This skill should be used when working with Speckit commands (speckit.specify, speckit.plan, speckit.implement) to maintain a centralized feature index. It adds a speckit.summarize command for archiving completed features and injects REGISTRY.md awareness into existing Speckit commands via a project rule. |
 | **codebuddy-speckit-code-review** | Adds a speckit.codereview command to the Speckit pipeline for automated code review after implementation. Reviews code against the feature spec, plan, and best practices. Sits between implement and summarize in the pipeline. Trigger keywords include speckit, review, code review, CR. |
 
+### prizm-kit: Full-Lifecycle Self-Improving Dev Toolkit
+
+**prizm-kit** is a comprehensive, independent AI development toolkit containing **28 skills** that cover the entire development lifecycle. It features built-in self-improvement through pattern learning and can take over any project.
+
+**Key Capabilities:**
+- **Spec-Driven Development**: specify, clarify, plan, tasks, implement, code-review, summarize — a complete feature delivery pipeline
+- **Prizm Documentation System**: AI-only progressive context loading (`.prizm-docs/`) with 3-level architecture (L0 index / L1 module / L2 detail)
+- **Self-Improving Memory**: Multi-layer learning memory (semantic/episodic/working) with pattern extraction and skill evolution
+- **Code Quality**: Security audit, dependency health checks, tech debt tracking
+- **Operations**: CI/CD generation, deployment strategy, database migration, monitoring setup
+- **Debugging**: Error triage, log analysis, performance profiling, bug reproduction
+- **Knowledge Management**: Onboarding guides, API docs, ADR management, knowledge extraction
+
+**Quick Start:**
+```bash
+# List all 28 prizm-kit skills
+python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --list
+
+# Install all skills with hooks
+python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --target .codebuddy/skills --hooks --project-root .
+
+# Install a specific skill
+python3 skills-master/assets/skill-templates/prizm-kit/scripts/install-prizmkit.py --skill prizmkit-init --target .codebuddy/skills
+```
+
+| Skill | Category | Description |
+| :--- | :--- | :--- |
+| **prizmkit-init** | Foundation | Project takeover: scan, assess, generate docs, initialize |
+| **prizmkit-memory** | Foundation | Multi-layer learning memory (semantic/episodic/working) |
+| **prizmkit-evolution** | Foundation | Self-improvement engine: generate skill patches from patterns |
+| **prizmkit-prizm-docs** | Documentation | AI-only progressive context loading framework |
+| **prizmkit-specify** | Spec-Driven | Create structured feature specifications |
+| **prizmkit-clarify** | Spec-Driven | Interactive requirement clarification |
+| **prizmkit-plan** | Spec-Driven | Generate technical plan + data model + API contracts |
+| **prizmkit-tasks** | Spec-Driven | Break plan into executable task list |
+| **prizmkit-implement** | Spec-Driven | Execute tasks following TDD approach |
+| **prizmkit-code-review** | Spec-Driven | Code review against spec and plan |
+| **prizmkit-summarize** | Spec-Driven | Archive completed features to REGISTRY.md |
+| **prizmkit-committer** | Commit | Commit with automatic Prizm doc update |
+| **prizmkit-retrospective** | Retrospective | Post-feature learning: extract lessons |
+| **prizmkit-security-audit** | Quality | Security vulnerability scanning |
+| **prizmkit-dependency-health** | Quality | Dependency audit: versions, vulnerabilities |
+| **prizmkit-tech-debt-tracker** | Quality | Technical debt identification and tracking |
+| **prizmkit-ci-cd-generator** | Operations | Generate CI/CD pipeline configurations |
+| **prizmkit-deployment-strategy** | Operations | Deployment planning with rollback |
+| **prizmkit-db-migration** | Operations | Database migration with rollback scripts |
+| **prizmkit-monitoring-setup** | Operations | Monitoring, alerting, log collection |
+| **prizmkit-error-triage** | Debugging | Error categorization and root cause analysis |
+| **prizmkit-log-analyzer** | Debugging | Log pattern analysis and anomaly detection |
+| **prizmkit-perf-profiler** | Debugging | Performance bottleneck identification |
+| **prizmkit-bug-reproducer** | Debugging | Minimal reproduction script generation |
+| **prizmkit-onboarding-generator** | Knowledge | Developer onboarding guide generation |
+| **prizmkit-api-doc-generator** | Knowledge | API documentation generation |
+| **prizmkit-adr-manager** | Knowledge | Architecture Decision Records management |
+| **prizmkit-knowledge-extractor** | Knowledge | Reusable pattern extraction from sessions |
+
 ---
 
 ## 🛠️ Installation
