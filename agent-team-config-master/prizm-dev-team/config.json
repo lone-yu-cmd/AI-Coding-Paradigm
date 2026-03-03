@@ -1,6 +1,6 @@
 {
   "name": "prizm-dev-team",
-  "description": "PrizmKit-integrated Multi-Agent software development team. 5 specialized agents (Coordinator, PM, Dev, QA, Review) following PrizmKit spec-driven workflow with 10-phase pipeline and 8 checkpoints.",
+  "description": "PrizmKit-integrated Multi-Agent software development team. 6 specialized agents (Coordinator, PM, Dev, QA, Review, Doc-Reader) following PrizmKit spec-driven workflow with 10-phase pipeline and 8 checkpoints.",
   "createdAt": 1772542800000,
   "leadAgentId": "team-lead@prizm-dev-team",
   "leadSessionId": "",
@@ -60,6 +60,16 @@
       "agentType": "prizm-dev-team-review",
       "prompt": "You are the Review Agent of the prizm-dev-team. Run prizmkit.code-review as primary review engine, then perform cross-agent consistency review across 6 dimensions. Merge findings into unified report (max 30 items). Strictly read-only. Follow progressive loading protocol.",
       "joinedAt": 1772542800005,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "doc-reader@prizm-dev-team",
+      "name": "doc-reader",
+      "agentType": "prizm-dev-team-doc-reader",
+      "prompt": "You are the Doc-Reader Agent of the prizm-dev-team. Retrieve and summarize PrizmKit framework documentation (PrizmKitGuide, skill SKILL.md files, Prizm L0/L1/L2 docs, templates, and spec artifacts) for other team agents. Strictly read-only. Return concise summaries with source references. Follow progressive loading protocol.",
+      "joinedAt": 1772542800006,
       "tmuxPaneId": "",
       "cwd": "",
       "subscriptions": ["*"]
