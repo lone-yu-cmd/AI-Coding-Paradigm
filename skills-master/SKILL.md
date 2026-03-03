@@ -28,6 +28,8 @@ The following skill templates are available in `assets/skill-templates/`:
 *   **codebuddy-speckit-summary**: Extends the Speckit pipeline with a Feature Registry system. This skill should be used when working with Speckit commands (speckit.specify, speckit.plan, speckit.implement) to maintain a centralized feature index. It adds a speckit.summarize command for archiving completed features and injects REGISTRY.md awareness into existing Speckit commands via a project rule.
 *   **codebuddy-speckit-code-review**: Adds a speckit.codereview command to the Speckit pipeline for automated code review after implementation. Reviews code against the feature spec, plan, and best practices. Sits between implement and summarize in the pipeline. Trigger keywords include speckit, review, code review, CR.
 
+*   **app-planner**: Interactive app planning that produces feature-list.json for dev-pipeline. Invoke when user wants to plan an app, design features, or prepare for automated development.
+
 *   **prizm-kit**: Full-lifecycle self-improving dev toolkit (28 skills). Covers spec-driven development, Prizm context docs, learning memory, code quality, debugging, deployment, and knowledge management. Install with `install-prizmkit.py`. Skills include:
     - Foundation: prizmkit-init, prizmkit-memory, prizmkit-evolution
     - Documentation: prizmkit-prizm-docs (AI-only progressive context loading)
