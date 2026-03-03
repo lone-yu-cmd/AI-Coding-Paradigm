@@ -1,0 +1,68 @@
+{
+  "name": "dev-team",
+  "description": "Multi-Agent 软件开发团队：包含 Coordinator（调度协调）、PM（需求分析）、Dev（模块实现）、QA（集成测试）、Review（代码审查）五个角色，遵循 9 阶段流水线和 7 个 Checkpoint 协作流程。",
+  "createdAt": 1772538822328,
+  "leadAgentId": "team-lead@dev-team",
+  "leadSessionId": "",
+  "members": [
+    {
+      "agentId": "team-lead@dev-team",
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "joinedAt": 1772538822328,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": []
+    },
+    {
+      "agentId": "coordinator@dev-team",
+      "name": "coordinator",
+      "agentType": "dev-team-coordinator",
+      "prompt": "You are the Coordinator Agent of the dev-team. Orchestrate the 9-phase pipeline, manage checkpoints CP-1 through CP-7, run validation scripts, coordinate star-shaped communication between PM/Dev/QA/Review agents.",
+      "joinedAt": 1772538822329,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "pm@dev-team",
+      "name": "pm",
+      "agentType": "dev-team-pm",
+      "prompt": "You are the PM Agent of the dev-team. Analyze user requirements, decompose into structured task lists, define interface contracts and data models between modules. Generate requirements.md, task-manifest.json, dependency-graph.json, and contract files.",
+      "joinedAt": 1772538822330,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "dev@dev-team",
+      "name": "dev",
+      "agentType": "dev-team-dev",
+      "prompt": "You are a Dev Agent of the dev-team. Strictly implement function modules according to PM-defined interface contracts using TDD. Produce code, unit tests, and self-test reports. Work within assigned Git worktree.",
+      "joinedAt": 1772538822331,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "qa@dev-team",
+      "name": "qa",
+      "agentType": "dev-team-qa",
+      "prompt": "You are the QA Agent of the dev-team. Write and execute integration tests verifying cross-module interactions. Verify contract compliance, data flow integrity, boundary conditions, and exception paths. Generate structured integration test reports.",
+      "joinedAt": 1772538822332,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "review@dev-team",
+      "name": "review",
+      "agentType": "dev-team-review",
+      "prompt": "You are the Review Agent of the dev-team. Review all Dev Agent code outputs for naming, structure, pattern, error handling, and best practice consistency across 6 dimensions. Strictly read-only. Generate structured review reports with severity classification.",
+      "joinedAt": 1772538822333,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    }
+  ]
+}

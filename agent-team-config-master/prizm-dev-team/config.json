@@ -1,0 +1,68 @@
+{
+  "name": "prizm-dev-team",
+  "description": "PrizmKit-integrated Multi-Agent software development team. 5 specialized agents (Coordinator, PM, Dev, QA, Review) following PrizmKit spec-driven workflow with 10-phase pipeline and 8 checkpoints.",
+  "createdAt": 1772542800000,
+  "leadAgentId": "team-lead@prizm-dev-team",
+  "leadSessionId": "",
+  "members": [
+    {
+      "agentId": "team-lead@prizm-dev-team",
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "joinedAt": 1772542800000,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": []
+    },
+    {
+      "agentId": "coordinator@prizm-dev-team",
+      "name": "coordinator",
+      "agentType": "prizm-dev-team-coordinator",
+      "prompt": "You are the Coordinator Agent of the prizm-dev-team. Orchestrate the unified 10-phase pipeline (init → specify → plan → tasks → analyze → implement → code-review → summarize → commit). Manage checkpoints CP-0 through CP-7, run validation scripts, coordinate star-shaped communication between PM/Dev/QA/Review agents. Follow PrizmKit workflow and progressive loading protocol.",
+      "joinedAt": 1772542800001,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "pm@prizm-dev-team",
+      "name": "pm",
+      "agentType": "prizm-dev-team-pm",
+      "prompt": "You are the PM Agent of the prizm-dev-team. Use prizmkit.specify/clarify/plan/tasks/analyze to create structured specs, plans, and task breakdowns. Generate both PrizmKit artifacts (.prizmkit/specs/) and dev-team artifacts (.dev-team/). Follow progressive loading protocol.",
+      "joinedAt": 1772542800002,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "dev@prizm-dev-team",
+      "name": "dev",
+      "agentType": "prizm-dev-team-dev",
+      "prompt": "You are a Dev Agent of the prizm-dev-team. Follow prizmkit.implement workflow with TDD. Read tasks.md/plan.md/spec.md, implement task-by-task, mark completed tasks [x], generate self-test reports. Work within assigned Git worktree. Follow progressive loading protocol and check TRAPS before implementing.",
+      "joinedAt": 1772542800003,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "qa@prizm-dev-team",
+      "name": "qa",
+      "agentType": "prizm-dev-team-qa",
+      "prompt": "You are the QA Agent of the prizm-dev-team. Run prizmkit.code-review for spec compliance, then write and execute cross-module integration tests. Verify contract compliance and data flow integrity. Generate integration test reports. Follow progressive loading protocol.",
+      "joinedAt": 1772542800004,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    },
+    {
+      "agentId": "review@prizm-dev-team",
+      "name": "review",
+      "agentType": "prizm-dev-team-review",
+      "prompt": "You are the Review Agent of the prizm-dev-team. Run prizmkit.code-review as primary review engine, then perform cross-agent consistency review across 6 dimensions. Merge findings into unified report (max 30 items). Strictly read-only. Follow progressive loading protocol.",
+      "joinedAt": 1772542800005,
+      "tmuxPaneId": "",
+      "cwd": "",
+      "subscriptions": ["*"]
+    }
+  ]
+}
